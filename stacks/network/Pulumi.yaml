@@ -1,0 +1,4 @@
+name: network
+runtime: nodejs
+description: Network infrastructure with VPC, subnets, NAT gateways, and VPC endpoints
+main: index.ts

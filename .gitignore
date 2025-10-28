@@ -1,0 +1,102 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.pytype/
+cov.xml
+*.cover
+.cache
+nosetests.xml
+coverage.xml
+*.log
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Pulumi
+.pulumi/
+Pulumi.*.yaml
+!Pulumi.yaml
+
+# Node modules
+node_modules/
+package-lock.json
+
+# TypeScript
+*.js
+*.d.ts
+!jest.config.js
+tsconfig.tsbuildinfo
+
+# Deployment artifacts
+deploy/*/config/*.yaml
+deploy/*/.pulumi/
+deploy/*/node_modules/
+deploy/*/Pulumi.*.yaml
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# AWS
+.aws/
+
+# Test coverage
+.coverage
+.pytest_cache/
+coverage/
+htmlcov/

@@ -1,0 +1,31 @@
+import * as pulumi from "@pulumi/pulumi";
+import * as aws from "@pulumi/aws";
+
+/**
+ * {{STACK_NAME}} Stack - Architecture 3.1
+ *
+ * {{STACK_DESCRIPTION}}
+ *
+ * Layer: {{STACK_LAYER}}
+ * Dependencies: {{DEPENDENCIES}}
+ */
+
+// Get configuration
+const config = new pulumi.Config();
+const deploymentId = config.require("deploymentId");
+const stackName = config.require("stackName");
+const environment = config.require("environment");
+const projectName = config.require("projectName");
+const orgName = config.require("orgName");
+
+// Get stack-specific configuration
+{{STACK_CONFIG_VARS}}
+
+// Import dependencies (v3.1 format: ${orgName}/${projectName}/${deploymentId}-${stackName}-${environment})
+{{DEPENDENCY_IMPORTS}}
+
+// Stack implementation
+{{STACK_RESOURCES}}
+
+// Exports
+{{STACK_EXPORTS}}

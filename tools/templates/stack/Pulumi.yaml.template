@@ -1,0 +1,7 @@
+name: {{STACK_NAME}}
+runtime:
+  name: nodejs
+  options:
+    typescript: true
+description: {{STACK_DESCRIPTION}}
+main: index.ts

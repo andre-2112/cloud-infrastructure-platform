@@ -1,0 +1,40 @@
+import * as pulumi from "@pulumi/pulumi";
+import * as aws from "@pulumi/aws";
+
+/**
+ * Example Component for {{STACK_NAME}}
+ */
+
+export interface {{COMPONENT_NAME}}Args {
+    /**
+     * Component arguments
+     */
+    name: string;
+    tags?: { [key: string]: string };
+    // Add more arguments as needed
+}
+
+export class {{COMPONENT_NAME}} extends pulumi.ComponentResource {
+    /**
+     * Example component implementation
+     */
+
+    public readonly id: pulumi.Output<string>;
+
+    constructor(
+        name: string,
+        args: {{COMPONENT_NAME}}Args,
+        opts?: pulumi.ComponentResourceOptions
+    ) {
+        super("custom:{{STACK_NAME}}:{{COMPONENT_NAME}}", name, {}, opts);
+
+        // Component implementation
+        // TODO: Implement component resources
+
+        this.id = pulumi.output("example-id");
+
+        this.registerOutputs({
+            id: this.id,
+        });
+    }
+}

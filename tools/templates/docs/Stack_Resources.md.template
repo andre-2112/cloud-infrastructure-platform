@@ -1,0 +1,28 @@
+# Stack Resources - {{STACK_NAME}}
+
+**Architecture Version:** 3.1
+**Last Updated:** {{DATE}}
+
+## Resource Inventory
+
+### Created Resources
+
+{{RESOURCE_INVENTORY}}
+
+### Resource Dependencies
+
+```
+{{RESOURCE_DEPENDENCY_GRAPH}}
+```
+
+## AWS Services Used
+
+{{AWS_SERVICES_LIST}}
+
+## Estimated Monthly Cost
+
+{{COST_ESTIMATE}}
+
+---
+
+**Generated from template:** Stack_Resources.md.template

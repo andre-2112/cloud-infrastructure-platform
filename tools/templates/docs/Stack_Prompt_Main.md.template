@@ -1,0 +1,58 @@
+# Stack Prompt - {{STACK_NAME}}
+
+**Stack Type:** {{STACK_TYPE}}
+**Architecture Version:** 3.1
+**Date:** {{DATE}}
+
+## Stack Overview
+
+{{STACK_DESCRIPTION}}
+
+## Purpose
+
+This stack provides:
+- {{PURPOSE_1}}
+- {{PURPOSE_2}}
+- {{PURPOSE_3}}
+
+## Dependencies
+
+This stack depends on:
+{{#DEPENDENCIES}}
+- {{DEPENDENCY_NAME}} (layer {{DEPENDENCY_LAYER}})
+{{/DEPENDENCIES}}
+
+## Resources to Create
+
+### Primary Resources
+{{#PRIMARY_RESOURCES}}
+1. **{{RESOURCE_NAME}}**
+   - Type: {{RESOURCE_TYPE}}
+   - Purpose: {{RESOURCE_PURPOSE}}
+{{/PRIMARY_RESOURCES}}
+
+### Supporting Resources
+{{#SUPPORTING_RESOURCES}}
+- {{RESOURCE_NAME}}: {{RESOURCE_DESCRIPTION}}
+{{/SUPPORTING_RESOURCES}}
+
+## Configuration Parameters
+
+{{#CONFIG_PARAMS}}
+- **{{PARAM_NAME}}**: {{PARAM_DESCRIPTION}} ({{PARAM_TYPE}})
+{{/CONFIG_PARAMS}}
+
+## Outputs
+
+{{#OUTPUTS}}
+- **{{OUTPUT_NAME}}**: {{OUTPUT_DESCRIPTION}} (used by: {{OUTPUT_CONSUMERS}})
+{{/OUTPUTS}}
+
+## Implementation Notes
+
+{{IMPLEMENTATION_NOTES}}
+
+---
+
+**Generated from template:** Stack_Prompt_Main.md.template
+**Platform:** cloud-0.7

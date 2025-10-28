@@ -1,0 +1,40 @@
+# Stack Definitions - {{STACK_NAME}}
+
+**Architecture Version:** 3.1
+**Date:** {{DATE}}
+
+## Stack Information
+
+- **Name:** {{STACK_NAME}}
+- **Layer:** {{STACK_LAYER}}
+- **Description:** {{STACK_DESCRIPTION}}
+- **Dependencies:** {{DEPENDENCIES_LIST}}
+
+## Resource Definitions
+
+### {{RESOURCE_CATEGORY_1}}
+
+{{RESOURCE_DEFINITIONS_1}}
+
+### {{RESOURCE_CATEGORY_2}}
+
+{{RESOURCE_DEFINITIONS_2}}
+
+## Configuration Schema
+
+```yaml
+{{STACK_NAME}}:
+  enabled: true
+  layer: {{STACK_LAYER}}
+  dependencies: [{{DEPENDENCIES_LIST}}]
+  config:
+    {{CONFIG_SCHEMA}}
+```
+
+## Exports
+
+{{EXPORTS_DOCUMENTATION}}
+
+---
+
+**Generated from template:** Stack_Definitions.md.template

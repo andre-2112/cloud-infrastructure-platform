@@ -1,0 +1,53 @@
+version: "3.1"
+template_name: "standard-template"
+description: "Standard deployment template for testing"
+
+metadata:
+  author: "Test Suite"
+  version: "1.0.0"
+
+stacks:
+  network:
+    enabled: true
+    dependencies: []
+    description: "Network infrastructure"
+    config:
+      vpcCidr: "10.0.0.0/16"
+      availabilityZones: 3
+
+  security:
+    enabled: true
+    dependencies: ["network"]
+    description: "Security groups and IAM"
+    config:
+      enableWaf: true
+
+  database:
+    enabled: true
+    dependencies: ["network", "security"]
+    description: "RDS database"
+    config:
+      engine: "postgres"
+      instanceClass: "db.t3.micro"
+
+  compute:
+    enabled: true
+    dependencies: ["network", "security", "database"]
+    description: "ECS/Fargate compute"
+    config:
+      cpu: "256"
+      memory: "512"
+
+  storage:
+    enabled: true
+    dependencies: ["network"]
+    description: "S3 storage"
+    config:
+      versioning: true
+
+  monitoring:
+    enabled: true
+    dependencies: []
+    description: "CloudWatch monitoring"
+    config:
+      retentionDays: 30

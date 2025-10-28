@@ -1,0 +1,25 @@
+name: authentication
+runtime: nodejs
+description: Authentication infrastructure with AWS Cognito user pools and identity pools
+
+config:
+  aws:region:
+    description: AWS region for deployment
+    default: us-east-1
+
+  orgName:
+    description: Pulumi organization name
+    type: string
+
+  project:
+    description: Project name for tagging
+    type: string
+
+  environment:
+    description: Environment name (dev, staging, prod)
+    type: string
+
+  deploymentId:
+    description: Unique deployment identifier
+    type: string
+main: index.ts

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Admin/Documents/Workspace/Pulumi-2/admin/v2/docs/**)",
+      "Read(//c/Users/Admin/Documents/Workspace/Pulumi-2/aws/build//**)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(awk:*)",
+      "Bash(xargs:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

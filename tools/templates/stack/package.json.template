@@ -1,0 +1,18 @@
+{
+  "name": "{{STACK_NAME}}",
+  "version": "0.7.0",
+  "description": "{{STACK_DESCRIPTION}}",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf bin node_modules"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@pulumi/pulumi": "^3.0.0",
+    "@pulumi/aws": "^6.0.0"
+  }
+}

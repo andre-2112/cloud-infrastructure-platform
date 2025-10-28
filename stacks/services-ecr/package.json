@@ -1,0 +1,12 @@
+{
+  "name": "@multi-stack/services-ecr",
+  "version": "0.7.0",
+  "description": "Services ECR stack for Multi-Stack Platform v2.2",
+  "private": true,
+  "main": "index.2.2.ts",
+  "scripts": {
+    "build": "tsc",
+    "preview": "pulumi preview",
+    "up": "pulumi up"
+  }
+}

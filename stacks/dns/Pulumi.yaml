@@ -1,0 +1,38 @@
+name: dns
+runtime: nodejs
+description: DNS infrastructure with Route53 hosted zone, ACM certificates, and health checks
+
+config:
+  aws:region:
+    description: AWS region for deployment
+    default: us-east-1
+
+  orgName:
+    description: Pulumi organization name
+    type: string
+
+  project:
+    description: Project name for tagging
+    type: string
+
+  environment:
+    description: Environment name (dev, staging, prod)
+    type: string
+
+  deploymentId:
+    description: Unique deployment identifier
+    type: string
+
+  domain:
+    description: Primary domain name
+    type: string
+
+  enableWildcardCert:
+    description: Enable wildcard SSL certificate
+    type: boolean
+    default: true
+
+  enableHealthChecks:
+    description: Enable Route53 health checks
+    type: boolean
+    default: true
