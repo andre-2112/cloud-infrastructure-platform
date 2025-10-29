@@ -1,8 +1,8 @@
 # Installation and Build Guide
 
 **Platform:** cloud-0.7
-**Architecture:** 3.1
-**Last Updated:** 2025-10-23
+**Architecture:** 4.1
+**Last Updated:** 2025-10-29
 
 ---
 
@@ -11,9 +11,12 @@
 1. [Prerequisites](#prerequisites)
 2. [Building a Single Pulumi Stack](#building-a-single-pulumi-stack)
 3. [Building All Pulumi Stacks](#building-all-pulumi-stacks)
-4. [Building the CLI](#building-the-cli)
-5. [Testing and Running the CLI](#testing-and-running-the-cli)
-6. [Troubleshooting](#troubleshooting)
+4. [Building the Core Library](#building-the-core-library)
+5. [Building the CLI](#building-the-cli)
+6. [Testing and Running the CLI](#testing-and-running-the-cli)
+7. [Enhanced Template System](#enhanced-template-system)
+8. [Auto-Extraction and Validation](#auto-extraction-and-validation)
+9. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -273,9 +276,77 @@ Failed: 0/16
 
 ---
 
+## Building the Core Library
+
+The core library (`cloud_core`) provides business logic for the platform and must be installed before the CLI.
+
+### Step-by-Step Installation
+
+**1. Navigate to core directory:**
+
+```bash
+cd cloud/tools/core
+```
+
+**2. Create a Python virtual environment (recommended):**
+
+```bash
+# Create venv
+python3 -m venv venv
+
+# Activate venv
+# On Linux/macOS:
+source venv/bin/activate
+
+# On Windows (Git Bash):
+source venv/Scripts/activate
+```
+
+**3. Install the core library in development mode:**
+
+```bash
+# Install with pip
+pip install -e .
+
+# This installs:
+# - pydantic - Data validation
+# - pyyaml - YAML parsing
+# - boto3 - AWS SDK
+# - All other dependencies
+```
+
+**4. Verify installation:**
+
+```bash
+# Test import
+python -c "from cloud_core.deployment import ConfigGenerator; print('✓ Core library installed')"
+
+# Expected output:
+# ✓ Core library installed
+```
+
+### Core Library Structure
+
+```
+cloud/tools/core/
+├── cloud_core/
+│   ├── deployment/         # Deployment management
+│   ├── orchestrator/       # Dependency resolution, execution
+│   ├── runtime/            # Placeholder resolution
+│   ├── templates/          # Enhanced template system
+│   ├── validation/         # Template-first validation
+│   ├── pulumi/             # Pulumi integration
+│   └── utils/              # Utilities
+├── tests/                  # 393+ tests
+├── setup.py
+└── requirements.txt
+```
+
+---
+
 ## Building the CLI
 
-The CLI is a Python application using Typer framework.
+The CLI (`cloud_cli`) is a Python application using Typer framework that wraps the core library.
 
 ### Step-by-Step Installation
 
@@ -305,7 +376,19 @@ venv\Scripts\activate.bat
 venv\Scripts\Activate.ps1
 ```
 
-**3. Install the CLI in development mode:**
+**3. Install core library first (if not already):**
+
+```bash
+# From CLI directory
+pip install -e ../core
+
+# Or if in separate environments, install core first
+cd ../core
+pip install -e .
+cd ../cli
+```
+
+**4. Install the CLI in development mode:**
 
 ```bash
 # Install with pip
@@ -313,14 +396,12 @@ pip install -e .
 
 # This installs:
 # - typer[all] - CLI framework
-# - pydantic - Data validation
-# - pyyaml - YAML parsing
+# - cloud_core - Core library (from ../core)
 # - rich - Terminal formatting
-# - boto3 - AWS SDK
 # - All other dependencies
 ```
 
-**4. Verify installation:**
+**5. Verify installation:**
 
 ```bash
 # Check version
@@ -329,8 +410,11 @@ python -m cloud_cli.main --version
 # Expected output:
 # Cloud Infrastructure Orchestration Platform CLI
 # Version: 0.7.0
-# Architecture: 3.1
+# Architecture: 4.1
 # Python: 3.13.x
+
+# Or using cloud-cli command (if installed globally)
+cloud-cli --version
 ```
 
 ### Alternative: Global Installation
@@ -708,15 +792,56 @@ python -m cloud_cli.main --help
 
 ---
 
+---
+
+## Enhanced Template System
+
+### Understanding Enhanced Templates
+
+Stack templates in v4.0+ include structured parameter declarations with types, defaults, and validation. Templates are located in `cloud/tools/templates/config/`.
+
+See [INSTALL_v4.1_additions.md](INSTALL_v4.1_additions.md) for complete enhanced template documentation.
+
+---
+
+## Auto-Extraction and Validation
+
+### Auto-Extraction System
+
+The auto-extraction system automatically generates stack templates from TypeScript code:
+
+```bash
+# Auto-extract and register a stack
+python -m cloud_cli.main register-stack <stack-name> --auto-extract
+```
+
+### Template-First Validation
+
+Validate that stack code matches its template:
+
+```bash
+# Validate a stack
+python -m cloud_cli.main validate-stack <stack-name>
+
+# Strict validation
+python -m cloud_cli.main validate-stack <stack-name> --strict
+```
+
+See [INSTALL_v4.1_additions.md](INSTALL_v4.1_additions.md) for complete auto-extraction and validation documentation.
+
+---
+
 **For additional documentation, see:**
-- [Multi_Stack_Architecture.3.1.md](Multi_Stack_Architecture.3.1.md) - Complete architecture
+- [Multi_Stack_Architecture.4.1.md](Multi_Stack_Architecture.4.1.md) - Complete architecture
+- [Complete_Stack_Management_Guide_v4.md](Complete_Stack_Management_Guide_v4.md) - Complete workflow guide
+- [Stack_Parameters_and_Registration_Guide_v4.md](Stack_Parameters_and_Registration_Guide_v4.md) - Template system
 - [CLI_Commands_Reference.3.1.md](CLI_Commands_Reference.3.1.md) - All CLI commands
-- [Directory_Structure_Diagram.3.1.md](Directory_Structure_Diagram.3.1.md) - Directory layout
+- [Directory_Structure_Diagram.4.1.md](Directory_Structure_Diagram.4.1.md) - Directory layout
 - [README.md](README.md) - Documentation index
 
 ---
 
-**Document Version:** 1.0
-**Last Updated:** 2025-10-23
+**Document Version:** 4.1
+**Last Updated:** 2025-10-29
 **Platform:** cloud-0.7
-**Architecture:** 3.1
+**Architecture:** 4.1
