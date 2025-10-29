@@ -1,14 +1,14 @@
 # Cloud Infrastructure Orchestration Platform - Documentation Index
 
 **Platform:** cloud-0.7
-**Architecture Version:** 3.1
-**Last Updated:** 2025-10-23
+**Architecture Version:** 4.1
+**Last Updated:** 2025-10-29
 
 ---
 
 ## Welcome
 
-This is the master documentation index for the Cloud Infrastructure Orchestration Platform (cloud-0.7). This platform provides comprehensive tools for managing complex, interdependent AWS infrastructure deployments using Pulumi.
+This is the master documentation index for the Cloud Infrastructure Orchestration Platform (cloud-0.7). This platform provides comprehensive tools for managing complex, interdependent AWS infrastructure deployments using Pulumi with a Python-based CLI and core business logic library.
 
 ---
 
@@ -17,20 +17,47 @@ This is the master documentation index for the Cloud Infrastructure Orchestratio
 | Document | Description |
 |----------|-------------|
 | [INSTALL.md](INSTALL.md) | **Start here!** Complete installation and build guide for stacks and CLI |
-| [Multi_Stack_Architecture.3.1.md](Multi_Stack_Architecture.3.1.md) | Main architecture document - comprehensive platform overview |
-| [Directory_Structure_Diagram.3.1.md](Directory_Structure_Diagram.3.1.md) | Complete directory structure and organization |
+| [Multi_Stack_Architecture.4.1.md](Multi_Stack_Architecture.4.1.md) | Main architecture document - comprehensive platform overview (v4.1) |
+| [Directory_Structure_Diagram.4.1.md](Directory_Structure_Diagram.4.1.md) | Complete directory structure and organization (v4.1) |
 
 ---
 
-## Core Architecture Documentation
+## Authoritative Documentation (v4.0+)
 
-### Primary Documents
+### Primary Architecture Documents
 
-| Document | Description |
-|----------|-------------|
-| [Multi_Stack_Architecture.3.1.md](Multi_Stack_Architecture.3.1.md) | Complete architecture specification (v3.1) |
-| [Directory_Structure_Diagram.3.1.md](Directory_Structure_Diagram.3.1.md) | Directory structure reference |
-| [Deployment_Manifest_Specification.3.1.md](Deployment_Manifest_Specification.3.1.md) | Manifest file format and schema |
+These documents define the current, authoritative architecture:
+
+| Document | Version | Description |
+|----------|---------|-------------|
+| [Complete_Stack_Management_Guide_v4.md](Complete_Stack_Management_Guide_v4.md) | 4.0 | 🔖 **Authoritative** - Complete platform workflow and management |
+| [Stack_Parameters_and_Registration_Guide_v4.md](Stack_Parameters_and_Registration_Guide_v4.md) | 4.0 | 🔖 **Authoritative** - Enhanced templates, parameters, and registration |
+| [Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md](Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md) | 4.0 | 🔖 **Authoritative** - Template system and configuration flow |
+| [Implementation_Compliance_Report_v4.md](Implementation_Compliance_Report_v4.md) | 4.0 | Architecture compliance verification report |
+
+### Core Architecture Documents (v4.1)
+
+Updated to align with v4.0 authoritative documents:
+
+| Document | Version | Description |
+|----------|---------|-------------|
+| [Multi_Stack_Architecture.4.1.md](Multi_Stack_Architecture.4.1.md) | 4.1 | Complete architecture specification |
+| [Directory_Structure_Diagram.4.1.md](Directory_Structure_Diagram.4.1.md) | 4.1 | Directory structure reference |
+| [Deployment_Manifest_Specification.4.1.md](Deployment_Manifest_Specification.4.1.md) | 4.1 | Manifest file format and schema |
+
+---
+
+## Core Architecture Documentation (v3.1 - Legacy)
+
+**Note:** v3.1 documents are now **legacy** and superseded by v4.1. They are kept for reference only.
+
+### Legacy Primary Documents
+
+| Document | Version | Status |
+|----------|---------|--------|
+| [Multi_Stack_Architecture.3.1.md](Multi_Stack_Architecture.3.1.md) | 3.1 | ⚠️ Legacy - See v4.1 |
+| [Directory_Structure_Diagram.3.1.md](Directory_Structure_Diagram.3.1.md) | 3.1 | ⚠️ Legacy - See v4.1 |
+| [Deployment_Manifest_Specification.3.1.md](Deployment_Manifest_Specification.3.1.md) | 3.1 | ⚠️ Legacy - See v4.1 |
 
 ---
 
@@ -43,6 +70,8 @@ This is the master documentation index for the Cloud Infrastructure Orchestratio
 | [CLI_Commands_Reference.3.1.md](CLI_Commands_Reference.3.1.md) | Complete CLI command documentation (25+ commands) |
 | [CLI_Commands_Quick_Reference.3.1.md](CLI_Commands_Quick_Reference.3.1.md) | Quick reference guide for CLI commands |
 | [CLI_Testing_Guide.3.1.md](CLI_Testing_Guide.3.1.md) | Testing procedures for the CLI |
+
+**Note:** CLI is implemented in **Python** using Typer framework, not TypeScript.
 
 ---
 
@@ -64,6 +93,7 @@ This is the master documentation index for the Cloud Infrastructure Orchestratio
 
 | Document | Description |
 |----------|-------------|
+| [Architecture_Inconsistency_Analysis_v3.1_to_v4.md](Architecture_Inconsistency_Analysis_v3.1_to_v4.md) | Analysis of changes from v3.1 to v4.0 |
 | [Addendum_Platform_Code.3.1.md](Addendum_Platform_Code.3.1.md) | Code examples and implementation patterns |
 | [Addendum_Changes_From_2.3.3.1.md](Addendum_Changes_From_2.3.3.1.md) | Complete changelog from Architecture 2.3 to 3.1 |
 | [Addendum_Questions_Answers.3.1.md](Addendum_Questions_Answers.3.1.md) | Architecture questions and design decisions |
@@ -74,35 +104,18 @@ This is the master documentation index for the Cloud Infrastructure Orchestratio
 
 ---
 
-## Session Management & Planning
-
-### Implementation Sessions
-
-These documents guide the incremental implementation of the platform:
-
-| Document | Description | Status |
-|----------|-------------|--------|
-| Execution_Feasibility_Analysis.md | Multi-session strategy and token analysis | ✅ Complete |
-| Session-1-Prompt.md | Session 1: Documentation generation | ✅ Complete |
-| Session-2.1.md | Session 2.1: Core platform implementation (Python CLI) | ✅ Complete |
-| Session-3.1.md | Session 3.1: Complete CLI implementation | 🚧 Planned |
-
-### Previous Session Reports
-
-| Document | Description |
-|----------|-------------|
-| Session_1_Final_Report_and_Session_2_Preparation.md | Session 1 completion report |
-| Session_1_Final_Verification_and_Corrections.md | Session 1 verification |
-| Final_Corrections_Report.md | Final corrections from Session 1 |
-
----
-
 ## Quick Navigation by Topic
 
 ### 🏗️ Architecture & Design
-- [Multi_Stack_Architecture.3.1.md](Multi_Stack_Architecture.3.1.md)
-- [Directory_Structure_Diagram.3.1.md](Directory_Structure_Diagram.3.1.md)
-- [Addendum_Changes_From_2.3.3.1.md](Addendum_Changes_From_2.3.3.1.md)
+- [Multi_Stack_Architecture.4.1.md](Multi_Stack_Architecture.4.1.md) - **Current architecture**
+- [Complete_Stack_Management_Guide_v4.md](Complete_Stack_Management_Guide_v4.md) - **Authoritative guide**
+- [Directory_Structure_Diagram.4.1.md](Directory_Structure_Diagram.4.1.md) - **Directory layout**
+- [Architecture_Inconsistency_Analysis_v3.1_to_v4.md](Architecture_Inconsistency_Analysis_v3.1_to_v4.md) - **v3.1 to v4.0 changes**
+
+### 📦 Templates & Configuration
+- [Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md](Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md) - **Authoritative template guide**
+- [Stack_Parameters_and_Registration_Guide_v4.md](Stack_Parameters_and_Registration_Guide_v4.md) - **Enhanced templates**
+- [Deployment_Manifest_Specification.4.1.md](Deployment_Manifest_Specification.4.1.md) - **Manifest format**
 
 ### 💻 CLI Usage
 - [INSTALL.md](INSTALL.md) - Installation guide
@@ -113,14 +126,11 @@ These documents guide the incremental implementation of the platform:
 - [REST_API_Documentation.3.1.md](REST_API_Documentation.3.1.md) - Full API docs
 - [REST_API_Quick_Reference.3.1.md](REST_API_Quick_Reference.3.1.md) - Quick reference
 
-### 📦 Deployment
-- [Deployment_Manifest_Specification.3.1.md](Deployment_Manifest_Specification.3.1.md) - Manifest format
-- [CLI_Commands_Reference.3.1.md](CLI_Commands_Reference.3.1.md) - Deployment commands
-
 ### 🧪 Testing & Validation
 - [CLI_Testing_Guide.3.1.md](CLI_Testing_Guide.3.1.md) - CLI testing
 - [REST_API_Testing_Guide.3.1.md](REST_API_Testing_Guide.3.1.md) - API testing
 - [Addendum_Verification_Architecture.3.1.md](Addendum_Verification_Architecture.3.1.md) - Validation tools
+- [Implementation_Compliance_Report_v4.md](Implementation_Compliance_Report_v4.md) - Compliance report
 
 ### 📊 Monitoring
 - [Addendum_Progress_Monitoring.3.1.md](Addendum_Progress_Monitoring.3.1.md) - WebSocket monitoring
@@ -141,18 +151,26 @@ cloud/
 ├── .claude/
 │   ├── CLAUDE.md                           # Memory bank configuration
 │   └── memory/                             # Session management documents
-│       ├── Execution_Feasibility_Analysis.md
-│       ├── Session-1-Prompt.md
-│       ├── Session-2.1.md
-│       └── Session-3.1.md
 │
 └── tools/
     ├── docs/                               # Platform documentation (YOU ARE HERE)
-    │   ├── README.md                       # This file
-    │   ├── INSTALL.md                      # Installation guide
-    │   ├── Multi_Stack_Architecture.3.1.md
-    │   ├── Directory_Structure_Diagram.3.1.md
-    │   ├── Deployment_Manifest_Specification.3.1.md
+    │   ├── README.md                       # This file (v4.1)
+    │   ├── INSTALL.md                      # Installation guide (v4.1)
+    │   │
+    │   ├── Multi_Stack_Architecture.4.1.md              # v4.1 Architecture
+    │   ├── Directory_Structure_Diagram.4.1.md           # v4.1 Directory structure
+    │   ├── Deployment_Manifest_Specification.4.1.md     # v4.1 Manifest spec
+    │   │
+    │   ├── Complete_Stack_Management_Guide_v4.md        # 🔖 Authoritative v4
+    │   ├── Stack_Parameters_and_Registration_Guide_v4.md  # 🔖 Authoritative v4
+    │   ├── Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md  # 🔖 Authoritative v4
+    │   ├── Implementation_Compliance_Report_v4.md
+    │   ├── Architecture_Inconsistency_Analysis_v3.1_to_v4.md
+    │   │
+    │   ├── Multi_Stack_Architecture.3.1.md              # Legacy v3.1
+    │   ├── Directory_Structure_Diagram.3.1.md           # Legacy v3.1
+    │   ├── Deployment_Manifest_Specification.3.1.md     # Legacy v3.1
+    │   │
     │   ├── CLI_Commands_Reference.3.1.md
     │   ├── CLI_Commands_Quick_Reference.3.1.md
     │   ├── CLI_Testing_Guide.3.1.md
@@ -167,15 +185,24 @@ cloud/
     │   ├── Addendum_Progress_Monitoring.3.1.md
     │   └── Addendum_Statistics.3.1.md
     │
-    ├── dev/                                # Development documents
-    │   ├── Session_1_Final_Report_and_Session_2_Preparation.md
-    │   ├── Session_1_Final_Verification_and_Corrections.md
-    │   └── Final_Corrections_Report.md
+    ├── core/                               # Core business logic library (Python)
+    │   └── cloud_core/
+    │       ├── deployment/
+    │       ├── orchestrator/
+    │       ├── runtime/
+    │       ├── templates/
+    │       ├── validation/
+    │       ├── pulumi/
+    │       └── utils/
     │
+    ├── cli/                                # CLI tool (Python)
+    │   └── cloud_cli/
+    │       ├── commands/
+    │       ├── parser/                     # Auto-extraction system
+    │       └── main.py
+    │
+    ├── dev/                                # Development documents
     └── install/                            # Installation scripts
-        ├── build_all_stacks.py
-        ├── build_stacks.sh
-        └── migrate_stacks.py
 ```
 
 ---
@@ -184,9 +211,68 @@ cloud/
 
 | Version | Date | Changes |
 |---------|------|---------|
+| **4.1** | **2025-10-29** | **Aligned with v4.0 authoritative documents, Python CLI, enhanced templates** |
+| 4.0 | 2025-10-28 | Template-first validation, auto-extraction, cross-stack dependencies |
 | 3.1 | 2025-10-21 | Updated Pulumi state management, stack naming, Python CLI |
 | 3.0 | 2025-10-08 | Template-based dependencies, smart deployment, layer execution |
 | 2.3 | 2025-10-01 | Multi-file TypeScript support, configuration tiers |
+
+---
+
+## Architecture Highlights (v4.1)
+
+### Core/CLI Architecture
+
+**Two-Tier Design:**
+- `tools/core/cloud_core/` - Business logic library (Python)
+- `tools/cli/cloud_cli/` - Command-line interface (Python)
+
+**Key Modules:**
+- Deployment management
+- Orchestration engine (dependency resolver, layer calculator)
+- Runtime resolution (placeholders, stack references)
+- Enhanced template system
+- Template-first validation
+- Auto-extraction system
+
+### Enhanced Template System (v4.0+)
+
+**Stack Templates with Parameters:**
+```yaml
+parameters:
+  inputs:
+    vpcCidr:
+      type: string
+      required: true
+      default: "10.0.0.0/16"
+
+  outputs:
+    vpcId:
+      type: string
+    privateSubnetIds:
+      type: array
+```
+
+**Auto-Extraction:**
+- Automatically extract parameters from TypeScript code
+- Generate templates from stack implementations
+- Validate code against templates
+
+### Configuration System
+
+**Pulumi Native Format:**
+```yaml
+network:vpcCidr: "10.0.0.0/16"
+network:availabilityZones: "3"
+aws:region: "us-east-1"
+```
+
+**Cross-Stack Dependencies:**
+```yaml
+database-rds:
+  config:
+    subnets: "${network.privateSubnetIds}"
+```
 
 ---
 
@@ -194,11 +280,14 @@ cloud/
 
 | Metric | Count |
 |--------|-------|
-| **Documentation Files** | 17 (16 v3.1 docs + this README) |
+| **Documentation Files (v4.1)** | 20+ |
+| **Documentation Files (Legacy v3.1)** | 16 |
 | **Architecture Stacks** | 16 |
 | **CLI Commands** | 25+ |
 | **REST API Endpoints** | 15+ |
 | **Supported Environments** | 3 (dev, stage, prod) |
+| **Core Test Suite** | 393+ tests passing |
+| **CLI Test Suite** | 38+ tests passing |
 
 ---
 
@@ -208,10 +297,14 @@ cloud/
 See [INSTALL.md](INSTALL.md) troubleshooting section
 
 ### Architecture Questions
-See [Addendum_Questions_Answers.3.1.md](Addendum_Questions_Answers.3.1.md)
+- See [Complete_Stack_Management_Guide_v4.md](Complete_Stack_Management_Guide_v4.md) for complete workflow
+- See [Architecture_Inconsistency_Analysis_v3.1_to_v4.md](Architecture_Inconsistency_Analysis_v3.1_to_v4.md) for v3.1 to v4.0 migration
 
 ### Command Usage
 See [CLI_Commands_Reference.3.1.md](CLI_Commands_Reference.3.1.md)
+
+### Template System
+See [Stack_Parameters_and_Registration_Guide_v4.md](Stack_Parameters_and_Registration_Guide_v4.md)
 
 ### API Usage
 See [REST_API_Documentation.3.1.md](REST_API_Documentation.3.1.md)
@@ -225,11 +318,14 @@ See [REST_API_Documentation.3.1.md](REST_API_Documentation.3.1.md)
 - Include table of contents for documents > 100 lines
 - Maintain version numbers in headers
 - Update this README when adding new documents
+- Mark deprecated documents clearly
 
 ### Code Standards
 - Python: Follow PEP 8, use type hints
-- TypeScript: Follow TSConfig strict mode
+- TypeScript: Follow TSConfig strict mode (for stacks)
 - All code must pass tests before commit
+- Use Black for Python formatting
+- Use Prettier for TypeScript formatting
 
 ---
 
@@ -241,13 +337,14 @@ See platform repository for license information.
 
 ## Contact
 
-For questions or support, refer to the platform maintainers.
+For questions or support, refer to the platform maintainers or open an issue on GitHub.
 
 ---
 
 **Platform:** cloud-0.7
-**Architecture:** 3.1
-**Total Documentation:** 17 files
-**Last Updated:** 2025-10-23
+**Architecture:** 4.1
+**Total Documentation:** 20+ files (v4.1) + 16 files (legacy v3.1)
+**Last Updated:** 2025-10-29
+**Implementation Status:** ✅ 100% Architecture Compliant (v4.0)
 
 **End of Documentation Index**
