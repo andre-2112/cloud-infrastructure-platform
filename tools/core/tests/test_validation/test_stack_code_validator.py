@@ -496,7 +496,7 @@ def test_validate_deployment_all_valid(validator, tmp_path):
 
     # Mock the StackTemplateManager to use our test config dir
     import unittest.mock as mock
-    with mock.patch('cloud_core.validation.stack_code_validator.StackTemplateManager') as mock_mgr:
+    with mock.patch('cloud_core.templates.stack_template_manager.StackTemplateManager') as mock_mgr:
         mock_instance = mock_mgr.return_value
         mock_instance.template_exists.return_value = True
         mock_instance.load_template.return_value = template
@@ -522,7 +522,7 @@ def test_validate_deployment_template_not_found(validator, tmp_path):
     }
 
     import unittest.mock as mock
-    with mock.patch('cloud_core.validation.stack_code_validator.StackTemplateManager') as mock_mgr:
+    with mock.patch('cloud_core.templates.stack_template_manager.StackTemplateManager') as mock_mgr:
         mock_instance = mock_mgr.return_value
         mock_instance.template_exists.return_value = False
 

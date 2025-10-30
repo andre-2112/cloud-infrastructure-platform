@@ -1,9 +1,9 @@
 # Complete Stack Management Guide v4
 
 **Platform:** cloud-0.7 Enhanced
-**Architecture:** 3.1 with Auto-Extraction and Validation
-**Version:** 4.0 (Unified Guide with Cross-Stack Dependencies)
-**Date:** 2025
+**Architecture:** 4.5 with Auto-Extraction, Validation, and Dynamic Pulumi.yaml
+**Version:** 4.5 (Unified Guide with Cross-Stack Dependencies and Dynamic Pulumi.yaml)
+**Date:** 2025-10-30
 **Status:** ✅ Fully Implemented (87% Coverage, 422 Tests Passing)
 
 ---
@@ -2602,9 +2602,9 @@ deploy/<id>/deployment-manifest.yaml    - Deployment manifest
 
 ---
 
-## End of Complete Stack Management Guide v3
+## End of Complete Stack Management Guide v4.5
 
-**Version:** 3.0 (Unified)
+**Version:** 4.5 (Unified)
 **Status:** Fully Implemented
 **Coverage:** 87%
 **Tests:** 422 passing

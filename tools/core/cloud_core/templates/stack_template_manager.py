@@ -44,8 +44,10 @@ class StackTemplateManager:
                 self.config_root = cwd_config
             else:
                 # Default: cloud/tools/templates/config/
-                cli_root = Path(__file__).parent.parent.parent.parent.parent
-                self.config_root = cli_root / "templates" / "config"
+                # Path: cloud/tools/core/cloud_core/templates/stack_template_manager.py
+                # Go up 3 levels: cloud_core/templates → cloud_core → core → tools
+                tools_root = Path(__file__).parent.parent.parent.parent
+                self.config_root = tools_root / "templates" / "config"
 
         # Ensure config directory exists
         self.config_root.mkdir(parents=True, exist_ok=True)

@@ -1,7 +1,7 @@
 """Tests for deployment ID utility"""
 
 import pytest
-from cloud_cli.utils.deployment_id import generate_deployment_id, validate_deployment_id
+from cloud_core.utils.deployment_id import generate_deployment_id, validate_deployment_id
 
 
 class TestDeploymentIdGeneration:

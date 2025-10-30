@@ -66,7 +66,7 @@ class ManifestGenerator:
 
         # Start with template as base
         manifest = {
-            "version": "3.1",
+            "version": template_data.get("version", "4.1"),  # Use template version, default to 4.1
             "deployment_id": deployment_id,
             "organization": organization,
             "project": project,

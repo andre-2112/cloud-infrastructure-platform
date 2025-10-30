@@ -7,8 +7,12 @@ Simplified implementation that can be enhanced with full Automation API later.
 
 import subprocess
 import json
+import shutil
+import time
+import yaml
 from pathlib import Path
 from typing import Dict, Any, Optional, List
+from contextlib import contextmanager
 from ..utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -365,3 +369,136 @@ class PulumiWrapper:
             return True
         except (FileNotFoundError, subprocess.CalledProcessError):
             return False
+
+    def _backup_pulumi_yaml(self, stack_dir: Path) -> Optional[Path]:
+        """
+        Backup original Pulumi.yaml
+
+        Args:
+            stack_dir: Stack directory containing Pulumi.yaml
+
+        Returns:
+            Path to backup file, or None if no backup created
+        """
+        pulumi_yaml = stack_dir / "Pulumi.yaml"
+        if not pulumi_yaml.exists():
+            logger.warning(f"No Pulumi.yaml found in {stack_dir}")
+            return None
+
+        backup_path = stack_dir / f"Pulumi.yaml.backup.{self.project}"
+
+        # Clean up stale backup from previous run
+        if backup_path.exists():
+            logger.warning(f"Found stale backup {backup_path}, removing")
+            backup_path.unlink()
+
+        # Retry up to 3 times with exponential backoff
+        for attempt in range(3):
+            try:
+                shutil.copy2(pulumi_yaml, backup_path)
+                logger.debug(f"Backed up Pulumi.yaml to {backup_path}")
+                return backup_path
+            except (PermissionError, IOError) as e:
+                if attempt < 2:
+                    wait_time = 2 ** attempt  # 1s, 2s
+                    logger.warning(f"Backup failed, retrying in {wait_time}s: {e}")
+                    time.sleep(wait_time)
+                else:
+                    raise PulumiError(f"Cannot backup Pulumi.yaml after 3 attempts: {e}")
+
+        return None
+
+    def _restore_pulumi_yaml(self, stack_dir: Path, backup_path: Optional[Path]) -> None:
+        """
+        Restore original Pulumi.yaml from backup
+
+        Args:
+            stack_dir: Stack directory
+            backup_path: Path to backup file
+        """
+        if not backup_path or not backup_path.exists():
+            return
+
+        pulumi_yaml = stack_dir / "Pulumi.yaml"
+
+        # Retry up to 3 times
+        for attempt in range(3):
+            try:
+                shutil.move(str(backup_path), str(pulumi_yaml))
+                logger.debug(f"Restored Pulumi.yaml from backup")
+                return
+            except (PermissionError, IOError) as e:
+                if attempt < 2:
+                    wait_time = 2 ** attempt
+                    logger.warning(f"Restore failed, retrying in {wait_time}s: {e}")
+                    time.sleep(wait_time)
+                else:
+                    logger.error(f"Cannot restore Pulumi.yaml after 3 attempts: {e}")
+                    # Don't raise - we're in cleanup, best effort
+
+    def _generate_pulumi_yaml(self, stack_dir: Path, stack_name: str) -> None:
+        """
+        Generate deployment-specific Pulumi.yaml
+
+        Args:
+            stack_dir: Stack directory
+            stack_name: Base stack name (e.g., "network")
+        """
+        pulumi_yaml = stack_dir / "Pulumi.yaml"
+
+        # Read original to preserve runtime and description
+        original_content = {}
+        if pulumi_yaml.exists():
+            try:
+                with open(pulumi_yaml, 'r') as f:
+                    original_content = yaml.safe_load(f) or {}
+            except Exception as e:
+                logger.warning(f"Could not read original Pulumi.yaml: {e}")
+
+        # Generate new content with deployment project name
+        new_content = {
+            'name': self.project,  # Use deployment project name
+            'runtime': original_content.get('runtime', 'nodejs'),
+            'description': original_content.get('description', f'{stack_name} stack'),
+        }
+
+        # Write deployment-specific Pulumi.yaml
+        try:
+            with open(pulumi_yaml, 'w') as f:
+                yaml.safe_dump(new_content, f, default_flow_style=False)
+            logger.info(f"Generated Pulumi.yaml with project: {self.project}")
+        except Exception as e:
+            raise PulumiError(f"Cannot generate Pulumi.yaml: {e}")
+
+    @contextmanager
+    def deployment_context(self, stack_dir: Path, stack_name: str):
+        """
+        Context manager for deployment-specific Pulumi.yaml
+
+        This ensures that Pulumi operations use the correct project name
+        by temporarily replacing Pulumi.yaml in the stack directory.
+
+        Usage:
+            with pulumi_wrapper.deployment_context(stack_dir, "network"):
+                # Pulumi operations here
+                pulumi_wrapper.select_stack(...)
+                pulumi_wrapper.up(...)
+
+        Args:
+            stack_dir: Stack directory path
+            stack_name: Base stack name
+
+        Yields:
+            None - Context for operations
+        """
+        backup_path = None
+        try:
+            # Backup and generate
+            backup_path = self._backup_pulumi_yaml(stack_dir)
+            self._generate_pulumi_yaml(stack_dir, stack_name)
+
+            yield
+
+        finally:
+            # Always restore original
+            self._restore_pulumi_yaml(stack_dir, backup_path)

@@ -1,3 +1,4 @@
+from cloud_cli.utils.console_utils import safe_print
 """
 Template Management Commands
 
@@ -142,7 +143,7 @@ def create_template_command(
         with open(template_file, 'w') as f:
             yaml.dump(template_data, f, default_flow_style=False, sort_keys=False)
 
-        console.print(f"[green]✓[/green] Template '{template_name}' created successfully")
+        safe_print(console, f"[green]✓[/green] Template '{template_name}' created successfully")
         console.print(f"  Location: {template_file}")
         console.print(f"\nEdit the template file to customize stacks and configuration")
 
@@ -194,7 +195,7 @@ def update_template_command(
         with open(template_file, 'w') as f:
             yaml.dump(template_data, f, default_flow_style=False, sort_keys=False)
 
-        console.print(f"[green]✓[/green] Template '{template_name}' updated successfully")
+        safe_print(console, f"[green]✓[/green] Template '{template_name}' updated successfully")
 
     except Exception as e:
         console.print(f"[red]Error:[/red] {e}")
@@ -246,10 +247,10 @@ def validate_template_command(
         if errors:
             console.print(f"[red]Validation failed for template '{template_name}':[/red]")
             for error in errors:
-                console.print(f"  ✗ {error}")
+                safe_print(console, f"  ✗ {error}")
             raise typer.Exit(1)
 
-        console.print(f"[green]✓ Template '{template_name}' is valid[/green]")
+        safe_print(console, f"[green]✓ Template '{template_name}' is valid[/green]")
 
         if warnings:
             console.print("\n[yellow]Warnings:[/yellow]")

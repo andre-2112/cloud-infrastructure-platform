@@ -1,3 +1,4 @@
+from cloud_cli.utils.console_utils import safe_print
 """
 Deploy Command
 
@@ -11,7 +12,7 @@ from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from pathlib import Path
 
-from cloud_core.deployment import DeploymentManager, StateManager, ConfigGenerator
+from cloud_core.deployment import DeploymentManager, StateManager, ConfigGenerator, StackStatus
 from cloud_core.orchestrator import Orchestrator
 from cloud_core.pulumi import PulumiWrapper, StackOperations
 from cloud_core.validation import ManifestValidator, DependencyValidator
@@ -87,7 +88,7 @@ def deploy_command(
                 console.print(f"  - {error}")
             raise typer.Exit(1)
 
-        console.print("[green]✓[/green] Manifest and dependencies valid")
+        safe_print(console, "[green]✓[/green] Manifest and dependencies valid")
 
         # Validate stack code against templates
         if validate_code:
@@ -121,14 +122,14 @@ def deploy_command(
                     if not result.valid:
                         console.print(f"\n  Stack: {stack_name}")
                         for error in result.errors[:3]:  # Show first 3 errors
-                            console.print(f"    ✗ {error.message}")
+                            safe_print(console, f"    ✗ {error.message}")
                         if result.get_error_count() > 3:
                             console.print(f"    ... and {result.get_error_count() - 3} more error(s)")
 
                 console.print("\n[yellow]Tip:[/yellow] Run 'cloud validate-stack <stack-name>' for detailed validation")
                 raise typer.Exit(1)
 
-            console.print("[green]✓[/green] Code validation passed")
+            safe_print(console, "[green]✓[/green] Code validation passed")
 
         console.print()
 
@@ -157,7 +158,7 @@ def deploy_command(
         ))
 
         console.print()
-        console.print("[green]✓[/green] Deployment completed successfully")
+        safe_print(console, "[green]✓[/green] Deployment completed successfully")
 
     except Exception as e:
         console.print(f"[red]Error:[/red] {e}")
@@ -175,9 +176,10 @@ async def _execute_deployment(
     stacks_root = cli_root / "stacks"
 
     # Initialize Pulumi
-    org = manifest["organization"]
-    project = manifest["project"]
-    pulumi_wrapper = PulumiWrapper(org, project)
+    # Use pulumiOrg (Pulumi Cloud organization), NOT organization (deployment org)
+    pulumi_org = manifest.get("pulumiOrg", manifest.get("organization", ""))
+    project = manifest.get("project", deployment_id)
+    pulumi_wrapper = PulumiWrapper(organization=pulumi_org, project=project)
     stack_ops = StackOperations(pulumi_wrapper)
 
     # Config generator
@@ -201,20 +203,23 @@ async def _execute_deployment(
             # Get Pulumi config values
             pulumi_config = config_gen.generate_pulumi_config_values(stack_name, environment)
 
-            # Deploy stack
-            success, error = stack_ops.deploy_stack(
-                deployment_id=deployment_id,
-                stack_name=stack_name,
-                environment=environment,
-                stack_dir=stack_dir,
-                config=pulumi_config,
-                preview_only=False,
-            )
+            # Use deployment context for Pulumi.yaml management
+            with pulumi_wrapper.deployment_context(stack_dir, stack_name):
+                # Deploy stack within context
+                success, error = stack_ops.deploy_stack(
+                    deployment_id=deployment_id,
+                    stack_name=stack_name,
+                    environment=environment,
+                    stack_dir=stack_dir,
+                    config=pulumi_config,
+                    preview_only=False,
+                )
+            # Pulumi.yaml automatically restored here
 
             if success:
-                state_manager.set_stack_status(stack_name, StateManager.StackStatus.DEPLOYED, environment)
+                state_manager.set_stack_status(stack_name, StackStatus.DEPLOYED, environment)
             else:
-                state_manager.set_stack_status(stack_name, StateManager.StackStatus.FAILED, environment)
+                state_manager.set_stack_status(stack_name, StackStatus.FAILED, environment)
 
             return success, error
 

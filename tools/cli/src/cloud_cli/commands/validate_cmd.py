@@ -1,3 +1,4 @@
+from cloud_cli.utils.console_utils import safe_print
 """
 Validation Commands
 
@@ -22,7 +23,7 @@ console = Console()
 logger = get_logger(__name__)
 
 
-@app.command(name="validate")
+@app.command()
 def validate_command(
     deployment_id: str = typer.Argument(..., help="Deployment ID"),
 ) -> None:
@@ -47,10 +48,10 @@ def validate_command(
         manifest_validator = ManifestValidator()
 
         if manifest_validator.validate(str(manifest_path)):
-            console.print("   [green]✓ Manifest is valid[/green]")
+            safe_print(console, "   [green]✓ Manifest is valid[/green]")
             manifest = manifest_validator.manifest
         else:
-            console.print("   [red]✗ Manifest validation failed:[/red]")
+            safe_print(console, "   [red]✗ Manifest validation failed:[/red]")
             for error in manifest_validator.errors:
                 console.print(f"      - {error}")
             all_valid = False
@@ -62,9 +63,9 @@ def validate_command(
             dep_validator = DependencyValidator()
 
             if dep_validator.validate(manifest):
-                console.print("   [green]✓ No dependency cycles found[/green]")
+                safe_print(console, "   [green]✓ No dependency cycles found[/green]")
             else:
-                console.print("   [red]✗ Dependency validation failed:[/red]")
+                safe_print(console, "   [red]✗ Dependency validation failed:[/red]")
                 for error in dep_validator.errors:
                     console.print(f"      - {error}")
                 all_valid = False
@@ -74,9 +75,9 @@ def validate_command(
         aws_validator = AWSValidator()
 
         if aws_validator.validate():
-            console.print("   [green]✓ AWS credentials are valid[/green]")
+            safe_print(console, "   [green]✓ AWS credentials are valid[/green]")
         else:
-            console.print("   [red]✗ AWS validation failed:[/red]")
+            safe_print(console, "   [red]✗ AWS validation failed:[/red]")
             for error in aws_validator.errors:
                 console.print(f"      - {error}")
             all_valid = False
@@ -86,9 +87,9 @@ def validate_command(
         pulumi_validator = PulumiValidator()
 
         if pulumi_validator.validate():
-            console.print("   [green]✓ Pulumi access is configured[/green]")
+            safe_print(console, "   [green]✓ Pulumi access is configured[/green]")
         else:
-            console.print("   [red]✗ Pulumi validation failed:[/red]")
+            safe_print(console, "   [red]✗ Pulumi validation failed:[/red]")
             for error in pulumi_validator.errors:
                 console.print(f"      - {error}")
             all_valid = False
@@ -96,9 +97,9 @@ def validate_command(
         # Summary
         console.print()
         if all_valid:
-            console.print("[green]✓ All validations passed[/green]")
+            safe_print(console, "[green]✓ All validations passed[/green]")
         else:
-            console.print("[red]✗ Some validations failed[/red]")
+            safe_print(console, "[red]✗ Some validations failed[/red]")
             raise typer.Exit(1)
 
     except Exception as e:
@@ -135,11 +136,11 @@ def validate_dependencies_command(
         dep_validator = DependencyValidator()
 
         if dep_validator.validate(manifest_validator.manifest):
-            console.print("[green]✓ No dependency cycles found[/green]")
+            safe_print(console, "[green]✓ No dependency cycles found[/green]")
             console.print(f"Total stacks: {dep_validator.total_stacks}")
             console.print(f"Dependency edges: {dep_validator.total_edges}")
         else:
-            console.print("[red]✗ Dependency validation failed:[/red]")
+            safe_print(console, "[red]✗ Dependency validation failed:[/red]")
             for error in dep_validator.errors:
                 console.print(f"  - {error}")
             raise typer.Exit(1)
@@ -160,13 +161,13 @@ def validate_aws_command() -> None:
         aws_validator = AWSValidator()
 
         if aws_validator.validate():
-            console.print("[green]✓ AWS credentials are valid[/green]")
+            safe_print(console, "[green]✓ AWS credentials are valid[/green]")
             if hasattr(aws_validator, 'account_id'):
                 console.print(f"  Account ID: {aws_validator.account_id}")
             if hasattr(aws_validator, 'region'):
                 console.print(f"  Region: {aws_validator.region}")
         else:
-            console.print("[red]✗ AWS validation failed:[/red]")
+            safe_print(console, "[red]✗ AWS validation failed:[/red]")
             for error in aws_validator.errors:
                 console.print(f"  - {error}")
             raise typer.Exit(1)
@@ -187,11 +188,11 @@ def validate_pulumi_command() -> None:
         pulumi_validator = PulumiValidator()
 
         if pulumi_validator.validate():
-            console.print("[green]✓ Pulumi is configured correctly[/green]")
+            safe_print(console, "[green]✓ Pulumi is configured correctly[/green]")
             if hasattr(pulumi_validator, 'cli_version'):
                 console.print(f"  CLI Version: {pulumi_validator.cli_version}")
         else:
-            console.print("[red]✗ Pulumi validation failed:[/red]")
+            safe_print(console, "[red]✗ Pulumi validation failed:[/red]")
             for error in pulumi_validator.errors:
                 console.print(f"  - {error}")
             console.print("\n[yellow]Setup instructions:[/yellow]")

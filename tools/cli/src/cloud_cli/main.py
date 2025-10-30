@@ -4,7 +4,7 @@ Cloud Infrastructure Orchestration Platform CLI
 
 Main entry point for the cloud CLI tool.
 Version: 0.7.0
-Architecture: 3.1
+Architecture: 4.1
 """
 
 import sys
@@ -33,7 +33,7 @@ from .commands import (
 # Create main Typer app
 app = typer.Typer(
     name="cloud",
-    help="Cloud Infrastructure Orchestration Platform CLI v0.7 (Architecture 3.1)",
+    help="Cloud Infrastructure Orchestration Platform CLI v0.7 (Architecture 4.1)",
     no_args_is_help=True,
     add_completion=True,
     rich_markup_mode="rich",
@@ -54,7 +54,7 @@ def main(
     """
     Cloud Infrastructure Orchestration Platform CLI
 
-    Manage cloud infrastructure deployments using Multi-Stack Architecture 3.1
+    Manage cloud infrastructure deployments using Multi-Stack Architecture 4.1
     """
     # Store global options in context
     ctx.ensure_object(dict)
@@ -75,24 +75,25 @@ def version() -> None:
     """Show version information"""
     rprint("[bold]Cloud Infrastructure Orchestration Platform CLI[/bold]")
     rprint(f"Version: [cyan]0.7.0[/cyan]")
-    rprint(f"Architecture: [cyan]3.1[/cyan]")
+    rprint(f"Architecture: [cyan]4.1[/cyan]")
     rprint(f"Python: [cyan]{sys.version.split()[0]}[/cyan]")
 
 
 # Register command modules
+# Note: When adding single-command Typer apps, DON'T specify a name to avoid repetition
 
 # Deployment lifecycle
-app.add_typer(init_cmd.app, name="init", help="Initialize a new deployment")
-app.add_typer(deploy_cmd.app, name="deploy", help="Deploy all stacks")
-app.add_typer(deploy_stack_cmd.app, name="deploy-stack", help="Deploy a single stack")
-app.add_typer(destroy_cmd.app, name="destroy", help="Destroy all stacks")
-app.add_typer(destroy_stack_cmd.app, name="destroy-stack", help="Destroy a single stack")
-app.add_typer(rollback_cmd.app, name="rollback", help="Rollback deployment")
+app.add_typer(init_cmd.app, help="Initialize a new deployment")
+app.add_typer(deploy_cmd.app, help="Deploy all stacks")
+app.add_typer(deploy_stack_cmd.app, help="Deploy a single stack")
+app.add_typer(destroy_cmd.app, help="Destroy all stacks")
+app.add_typer(destroy_stack_cmd.app, help="Destroy a single stack")
+app.add_typer(rollback_cmd.app, help="Rollback deployment")
 
 # Status and monitoring
-app.add_typer(status_cmd.app, name="status", help="Show deployment status")
-app.add_typer(list_cmd.app, name="list", help="List all deployments")
-app.add_typer(logs_cmd.app, name="logs", help="View deployment logs")
+app.add_typer(status_cmd.app, help="Show deployment status")
+app.add_typer(list_cmd.app, help="List all deployments")
+app.add_typer(logs_cmd.app, help="View deployment logs")
 
 # Environment management
 app.add_typer(environment_cmd.app, name="enable-environment", help="Enable an environment")

@@ -1,20 +1,20 @@
 # Default Deployment Template
-# Version: 3.1
+# Version: 4.1
 # Platform: cloud-0.7
 
-version: "3.1"
+version: "4.1"
 template_name: "default"
 description: "Default multi-stack AWS infrastructure template"
 
 metadata:
   author: "Cloud Platform"
   created: "2025-10-23"
-  architecture_version: "3.1"
+  architecture_version: "4.1"
 
 # Stack configurations
 stacks:
   network:
-    enabled: true
+    enabled: false
     layer: 1
     dependencies: []
     config:
@@ -22,7 +22,7 @@ stacks:
       availability_zones: 3
 
   security:
-    enabled: true
+    enabled: false
     layer: 2
     dependencies:
       - network
@@ -30,7 +30,7 @@ stacks:
       create_default_sg: true
 
   dns:
-    enabled: true
+    enabled: false
     layer: 2
     dependencies:
       - network
@@ -38,7 +38,7 @@ stacks:
       hosted_zone_type: "public"
 
   secrets:
-    enabled: true
+    enabled: false
     layer: 2
     dependencies: []
     config:
@@ -53,7 +53,7 @@ stacks:
       user_pool_name: "{{deployment_id}}-users"
 
   storage:
-    enabled: true
+    enabled: false
     layer: 3
     dependencies:
       - security
@@ -73,7 +73,7 @@ stacks:
       allocated_storage: 20
 
   containers-images:
-    enabled: true
+    enabled: false
     layer: 4
     dependencies:
       - authentication
@@ -93,7 +93,7 @@ stacks:
       memory: 512
 
   services-ecr:
-    enabled: true
+    enabled: false
     layer: 4
     dependencies: []
     config:
@@ -150,7 +150,7 @@ stacks:
       timeout: 300
 
   monitoring:
-    enabled: true
+    enabled: false
     layer: 7
     dependencies:
       - network

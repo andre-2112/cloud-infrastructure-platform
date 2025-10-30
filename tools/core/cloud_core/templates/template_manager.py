@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Any
 import yaml
 
 from ..utils.logger import get_logger
+from ..utils.path_utils import get_templates_dir
 
 logger = get_logger(__name__)
 
@@ -39,13 +40,11 @@ class TemplateManager:
         if templates_root:
             self.templates_root = Path(templates_root)
         else:
-            # Try CWD first (for tests and local development)
-            cwd_templates = Path.cwd() / "tools" / "templates"
-            if cwd_templates.exists():
-                self.templates_root = cwd_templates
-            else:
-                # Default: cloud/tools/templates/
-                # Assuming CLI is at cloud/tools/cli/, go up to tools, then to templates
+            # Use path utility to find templates directory from anywhere
+            try:
+                self.templates_root = get_templates_dir()
+            except RuntimeError:
+                # Fallback: use __file__ relative path
                 cli_root = Path(__file__).parent.parent.parent.parent.parent
                 self.templates_root = cli_root / "templates"
 
@@ -175,7 +174,7 @@ class TemplateManager:
 
         # Validate version (if present)
         version = template_data.get("version")
-        if version and not version.startswith("3."):
+        if version and not (version.startswith("3.") or version.startswith("4.")):
             raise TemplateValidationError(
                 f"Template '{template_name}' has unsupported version: {version}"
             )

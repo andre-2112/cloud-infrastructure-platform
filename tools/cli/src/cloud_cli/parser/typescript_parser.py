@@ -41,17 +41,18 @@ class TypeScriptParser:
     """Parse TypeScript stack code to extract parameters"""
 
     # Patterns for different config access methods
+    # Updated to match with or without default values (e.g., config.get("param", "default"))
     CONFIG_PATTERNS = {
-        'require': r"config\.require\(['\"](\w+)['\"]\)",
-        'get': r"config\.get\(['\"](\w+)['\"]\)",
-        'requireSecret': r"config\.requireSecret\(['\"](\w+)['\"]\)",
-        'getSecret': r"config\.getSecret\(['\"](\w+)['\"]\)",
-        'requireBoolean': r"config\.requireBoolean\(['\"](\w+)['\"]\)",
-        'getBoolean': r"config\.getBoolean\(['\"](\w+)['\"]\)",
-        'requireNumber': r"config\.requireNumber\(['\"](\w+)['\"]\)",
-        'getNumber': r"config\.getNumber\(['\"](\w+)['\"]\)",
-        'requireObject': r"config\.requireObject\(['\"](\w+)['\"]\)",
-        'getObject': r"config\.getObject\(['\"](\w+)['\"]\)",
+        'require': r"config\.require\(['\"](\w+)['\"](?:\s*,\s*[^)]+)?\)",
+        'get': r"config\.get\(['\"](\w+)['\"](?:\s*,\s*[^)]+)?\)",
+        'requireSecret': r"config\.requireSecret\(['\"](\w+)['\"](?:\s*,\s*[^)]+)?\)",
+        'getSecret': r"config\.getSecret\(['\"](\w+)['\"](?:\s*,\s*[^)]+)?\)",
+        'requireBoolean': r"config\.requireBoolean\(['\"](\w+)['\"](?:\s*,\s*[^)]+)?\)",
+        'getBoolean': r"config\.getBoolean\(['\"](\w+)['\"](?:\s*,\s*[^)]+)?\)",
+        'requireNumber': r"config\.requireNumber\(['\"](\w+)['\"](?:\s*,\s*[^)]+)?\)",
+        'getNumber': r"config\.getNumber\(['\"](\w+)['\"](?:\s*,\s*[^)]+)?\)",
+        'requireObject': r"config\.requireObject\(['\"](\w+)['\"](?:\s*,\s*[^)]+)?\)",
+        'getObject': r"config\.getObject\(['\"](\w+)['\"](?:\s*,\s*[^)]+)?\)",
     }
 
     # Pattern for export statements

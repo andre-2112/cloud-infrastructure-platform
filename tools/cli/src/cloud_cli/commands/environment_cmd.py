@@ -1,3 +1,4 @@
+from cloud_cli.utils.console_utils import safe_print
 """
 Environment Management Commands
 
@@ -68,7 +69,7 @@ def enable_environment_command(
         with open(manifest_path, 'w') as f:
             yaml.dump(manifest, f, default_flow_style=False, sort_keys=False)
 
-        console.print(f"[green]✓[/green] Enabled environment '{environment}' for {updated_count} stack(s)")
+        safe_print(console, f"[green]✓[/green] Enabled environment '{environment}' for {updated_count} stack(s)")
 
     except Exception as e:
         console.print(f"[red]Error:[/red] {e}")
@@ -121,7 +122,7 @@ def disable_environment_command(
         with open(manifest_path, 'w') as f:
             yaml.dump(manifest, f, default_flow_style=False, sort_keys=False)
 
-        console.print(f"[green]✓[/green] Disabled environment '{environment}' for {updated_count} stack(s)")
+        safe_print(console, f"[green]✓[/green] Disabled environment '{environment}' for {updated_count} stack(s)")
 
     except Exception as e:
         console.print(f"[red]Error:[/red] {e}")

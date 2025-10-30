@@ -9,11 +9,13 @@ from typing import Optional
 from rich.console import Console
 from pathlib import Path
 
-from cloud_core.deployment import DeploymentManager, StateManager, ConfigGenerator
+from cloud_core.deployment import DeploymentManager, StateManager, ConfigGenerator, StackStatus
 from cloud_core.orchestrator import DependencyResolver
 from cloud_core.pulumi import PulumiWrapper, StackOperations
 from cloud_core.validation import ManifestValidator
 from cloud_core.utils.logger import get_logger
+from cloud_cli.utils.path_utils import get_stacks_dir
+from cloud_cli.utils.console_utils import safe_print
 
 app = typer.Typer()
 console = Console()
@@ -41,7 +43,7 @@ def deploy_stack_command(
         deployment_manager = DeploymentManager()
         deployment_dir = deployment_manager.get_deployment_dir(deployment_id)
 
-        if not deployment_dir.exists():
+        if deployment_dir is None or not deployment_dir.exists():
             console.print(f"[red]Error:[/red] Deployment {deployment_id} not found")
             raise typer.Exit(1)
 
@@ -96,42 +98,57 @@ def deploy_stack_command(
         console.print(f"\n[bold]Deploying stack {stack_name} ({environment})...[/bold]")
 
         state_manager = StateManager(deployment_dir)
-        state_manager.update_stack_state(stack_name, environment, "deploying")
+        state_manager.set_stack_status(stack_name, StackStatus.DEPLOYING, environment)
 
-        pulumi_wrapper = PulumiWrapper()
+        # Get Pulumi organization and project from manifest
+        pulumi_org = manifest.get("pulumiOrg", manifest.get("organization", ""))
+        project = manifest.get("project", deployment_id)  # Use deployment project name
+
+        pulumi_wrapper = PulumiWrapper(organization=pulumi_org, project=project)
         stack_ops = StackOperations(pulumi_wrapper)
 
         try:
             # Get stack directory
-            stack_dir = Path.cwd() / "stacks" / stack_name
+            stack_dir = get_stacks_dir() / stack_name
 
-            # Deploy
-            if preview:
-                console.print("[cyan]Running preview...[/cyan]")
-                result = stack_ops.preview(
+            # Get stack config and convert all values to strings
+            stack_custom_config = stack_config.get("config", {})
+
+            # Build complete config with required deployment metadata
+            config = {
+                "project": manifest.get("project", ""),
+                "environment": environment,
+                "deploymentId": deployment_id,
+                "pulumiOrg": manifest.get("pulumiOrg", manifest.get("organization", "")),
+                "region": manifest.get("environments", {}).get(environment, {}).get("region", "us-east-1"),
+            }
+
+            # Add stack-specific config (all values as strings)
+            config.update({k: str(v) for k, v in stack_custom_config.items()})
+
+            # Use deployment context for Pulumi.yaml management
+            with pulumi_wrapper.deployment_context(stack_dir, stack_name):
+                # Deploy within context
+                success, error = stack_ops.deploy_stack(
                     deployment_id=deployment_id,
                     stack_name=stack_name,
                     environment=environment,
-                    work_dir=str(stack_dir),
+                    stack_dir=stack_dir,
+                    config=config,
+                    preview_only=preview,
                 )
-            else:
-                result = stack_ops.up(
-                    deployment_id=deployment_id,
-                    stack_name=stack_name,
-                    environment=environment,
-                    work_dir=str(stack_dir),
-                )
+            # Pulumi.yaml automatically restored here
 
-            if result["success"]:
-                state_manager.update_stack_state(stack_name, environment, "deployed")
-                console.print(f"\n[green]✓[/green] Stack {stack_name} deployed successfully")
+            if success:
+                state_manager.set_stack_status(stack_name, StackStatus.DEPLOYED, environment)
+                safe_print(console, f"\n[green]✓[/green] Stack {stack_name} deployed successfully")
             else:
-                state_manager.update_stack_state(stack_name, environment, "failed")
-                console.print(f"\n[red]✗[/red] Stack deployment failed")
+                state_manager.set_stack_status(stack_name, StackStatus.FAILED, environment)
+                safe_print(console, f"\n[red]✗[/red] Stack deployment failed: {error}")
                 raise typer.Exit(1)
 
         except Exception as e:
-            state_manager.update_stack_state(stack_name, environment, "failed")
+            state_manager.set_stack_status(stack_name, StackStatus.FAILED, environment)
             raise e
 
     except Exception as e:

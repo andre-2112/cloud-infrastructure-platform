@@ -1,11 +1,11 @@
-# Cloud Architecture v4.1 - Deployment Manifest Specification
+# Cloud Architecture v4.5 - Deployment Manifest Specification
 
-**Version:** 4.1
-**Last Updated:** 2025-10-29
+**Version:** 4.5
+**Last Updated:** 2025-10-30
 **Status:** Production Ready
-**Architecture:** Aligned with v4.0 authoritative documents
+**Architecture:** Aligned with v4.0 authoritative documents, enhanced in v4.5
 
-**Changes from v3.1:**
+**Changes from v3.1 to v4.1:**
 - **CRITICAL:** Changed from JSON to YAML format
 - **CRITICAL:** Updated config file location to config/ subdirectory
 - **CRITICAL:** Updated config format to Pulumi native format
@@ -15,6 +15,13 @@
 - Added validation against enhanced stack templates
 - Updated all examples to reflect Python CLI implementation
 - Aligned with Complete_Stack_Management_Guide_v4.md
+
+**Changes from v4.1 to v4.5:**
+- **CRITICAL:** Added `pulumiOrg` field for Pulumi Cloud organization (distinct from `organization`)
+- **CRITICAL:** Added `project` field for Pulumi Cloud project naming
+- Documented dynamic Pulumi.yaml management integration
+- All stacks default to `enabled: false` in templates
+- Enhanced Pulumi stack naming: `{pulumiOrg}/{project}/{deployment-id}-{stack-name}-{environment}`
 
 ---
 
@@ -37,13 +44,14 @@
 
 ## Overview
 
-The Deployment Manifest is the **single source of truth** for all deployment configuration in Cloud Architecture v4.1. Each deployment has exactly one `deployment-manifest.yaml` file that defines:
+The Deployment Manifest is the **single source of truth** for all deployment configuration in Cloud Architecture v4.5. Each deployment has exactly one `deployment-manifest.yaml` file that defines:
 
-- Deployment metadata (ID, organization, project, domain)
+- Deployment metadata (ID, organization, project, domain, pulumiOrg)
 - Environment configurations (dev, stage, prod)
 - Stack configurations and parameters
 - Cross-stack dependencies
 - Environment-specific overrides
+- Pulumi Cloud organization structure (NEW in v4.5)
 
 ### Key Principles
 
@@ -188,11 +196,21 @@ stacks:
 The deployment metadata section contains information about the deployment:
 
 ```yaml
+version: "4.5"
 deployment_id: D1TEST1
 organization: TestOrg
+pulumiOrg: acme-corp                        # NEW in v4.5: Pulumi Cloud organization
 project: test-project
 domain: example.com
+template: default
+created_at: "2025-10-30T10:00:00Z"
 description: "Test deployment for e-commerce platform"
+metadata:
+  generated_from_template: default
+  generator_version: 0.7.0
+  author: Cloud Platform
+  created: "2025-10-30"
+  architecture_version: "4.5"
 tags:
   cost-center: engineering
   team: platform
@@ -203,12 +221,34 @@ tags:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
+| `version` | string | Yes | Manifest format version (e.g., "4.5") |
 | `deployment_id` | string | Yes | Unique deployment ID (format: `D[A-Z0-9]{6}`) |
-| `organization` | string | Yes | Organization name (1-100 characters) |
-| `project` | string | Yes | Project name (1-100 characters) |
+| `organization` | string | Yes | Business organization name (for directory naming, tags) |
+| `pulumiOrg` | string | Yes | **NEW v4.5:** Pulumi Cloud organization (e.g., "acme-corp") |
+| `project` | string | Yes | Business project name (used for Pulumi Cloud project naming) |
 | `domain` | string | Yes | Domain name for the deployment |
+| `template` | string | Yes | Template name used to generate manifest (e.g., "default") |
+| `created_at` | string | Yes | ISO 8601 timestamp of deployment creation |
 | `description` | string | No | Optional deployment description |
+| `metadata` | object | No | Template generation metadata |
 | `tags` | object | No | Custom key-value tags |
+
+### Important Distinctions (NEW in v4.5)
+
+**`organization` vs `pulumiOrg`:**
+- `organization`: Business organization name used for directory naming and tagging
+  - Example: "TestOrg", "CompanyA", "Acme Corporation"
+  - Used in deployment directory: `D1TEST1-TestOrg-test-project/`
+- `pulumiOrg`: Pulumi Cloud organization identifier
+  - Example: "andre-2112", "acme-corp", "my-pulumi-org"
+  - Used in Pulumi stack naming: `andre-2112/test-project/D1TEST1-network-dev`
+  - Must match your Pulumi Cloud organization name exactly
+
+**`project` field:**
+- Business project name used for Pulumi Cloud project grouping
+- All stacks for this deployment grouped under this project in Pulumi Cloud
+- Enables proper organization: `{pulumiOrg}/{project}/{deployment-id}-{stack}-{env}`
+- Example: project "ecommerce" groups all ecommerce stacks together
 
 ### Deployment ID Format
 

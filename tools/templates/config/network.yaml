@@ -1,0 +1,171 @@
+name: network
+version: "2.2"
+description: "VPC and networking infrastructure with multi-AZ support"
+layer: 1
+
+parameters:
+  inputs:
+    # Required inputs
+    project:
+      type: string
+      required: true
+      secret: false
+      description: "Project name for resource naming and tagging"
+
+    environment:
+      type: string
+      required: true
+      secret: false
+      description: "Environment name (dev, stage, prod)"
+
+    deploymentId:
+      type: string
+      required: true
+      secret: false
+      description: "Deployment ID for resource tagging and identification"
+
+    pulumiOrg:
+      type: string
+      required: true
+      secret: false
+      description: "Pulumi organization name for stack references"
+
+    region:
+      type: string
+      required: true
+      secret: false
+      default: "us-east-1"
+      description: "AWS region for deployment"
+
+    # Optional inputs with defaults
+    vpcCidr:
+      type: string
+      required: false
+      secret: false
+      default: "10.0.0.0/16"
+      description: "CIDR block for VPC (e.g., 10.0.0.0/16)"
+
+    enableFlowLogs:
+      type: boolean
+      required: false
+      secret: false
+      default: true
+      description: "Enable VPC Flow Logs for network monitoring and security analysis"
+
+    enableVpcEndpoints:
+      type: boolean
+      required: false
+      secret: false
+      default: true
+      description: "Enable VPC endpoints for AWS services (S3, ECR) to reduce data transfer costs"
+
+    highAvailabilityNat:
+      type: boolean
+      required: false
+      secret: false
+      default: false
+      description: "Enable multiple NAT Gateways for high availability (one per AZ). Set to true for production."
+
+  outputs:
+    # VPC Information
+    vpcId:
+      type: string
+      description: "VPC ID for cross-stack references"
+
+    vpcArn:
+      type: string
+      description: "VPC ARN for IAM policies and resource-based policies"
+
+    vpcCidrBlock:
+      type: string
+      description: "Actual VPC CIDR block used"
+
+    # Subnet IDs (critical for cross-stack references)
+    publicSubnetIds:
+      type: array
+      description: "Public subnet IDs for ALB and ECS Fargate containers (multi-AZ)"
+
+    privateSubnetIds:
+      type: array
+      description: "Private subnet IDs for internal resources and services (multi-AZ)"
+
+    databaseSubnetIds:
+      type: array
+      description: "Database subnet IDs for RDS and ElastiCache (multi-AZ)"
+
+    # Availability Zones
+    availabilityZones:
+      type: array
+      description: "Availability zones used for multi-AZ deployment"
+
+    # Gateway Information
+    internetGatewayId:
+      type: string
+      description: "Internet Gateway ID for public internet access"
+
+    natGatewayIds:
+      type: array
+      description: "NAT Gateway IDs for private subnet internet access"
+
+    natGatewayIps:
+      type: array
+      description: "NAT Gateway Elastic IP addresses"
+
+    # Route Table Information
+    publicRouteTableId:
+      type: string
+      description: "Public route table ID"
+
+    privateRouteTableIds:
+      type: array
+      description: "Private route table IDs (one per AZ)"
+
+    databaseRouteTableIds:
+      type: array
+      description: "Database route table IDs (isolated tier)"
+
+    # Optional: Flow Logs Information
+    flowLogsLogGroupName:
+      type: string
+      description: "CloudWatch log group name for VPC Flow Logs (if enabled)"
+
+    # Optional: VPC Endpoints Information
+    s3VpcEndpointId:
+      type: string
+      description: "S3 VPC endpoint ID (if enabled)"
+
+    ecrApiVpcEndpointId:
+      type: string
+      description: "ECR API VPC endpoint ID (if enabled)"
+
+    ecrDkrVpcEndpointId:
+      type: string
+      description: "ECR Docker VPC endpoint ID (if enabled)"
+
+    # Stack Metadata
+    stackName:
+      type: string
+      description: "Stack name identifier"
+
+    stackEnvironment:
+      type: string
+      description: "Environment this stack is deployed to"
+
+    stackDeploymentId:
+      type: string
+      description: "Deployment ID this stack belongs to"
+
+    stackVersion:
+      type: string
+      description: "Stack version for tracking updates"
+
+    __exists:
+      type: boolean
+      description: "Existence marker for stack verification"
+
+    summary:
+      type: object
+      description: "Comprehensive summary object with VPC, subnets, networking, and deployment information"
+
+dependencies: []
+priority: 100

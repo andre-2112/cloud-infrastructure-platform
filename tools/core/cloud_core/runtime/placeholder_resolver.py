@@ -2,8 +2,16 @@
 Placeholder Resolver
 
 Resolves runtime placeholders in configuration values.
-Supports: {{deployment.id}}, ${stack.network.vpcId}, {{aws.vpc.default}}, etc.
-Both {{...}} and ${...} syntaxes are supported.
+
+Supported placeholders (using ${...} syntax):
+- ${deployment.id} - Deployment identifiers
+- ${stack.network.vpcId} - Cross-stack references
+- ${aws.vpc.default} - AWS resource queries
+- ${env.VAR_NAME} - Environment variables
+
+**Syntax:**
+- ${...} is the preferred syntax (v4.1+)
+- {{...}} legacy syntax is supported for backward compatibility (DEPRECATED)
 """
 
 import re
@@ -16,8 +24,9 @@ logger = get_logger(__name__)
 class PlaceholderResolver:
     """Resolves runtime placeholders in configuration"""
 
-    # Pattern for placeholders: {{type.path.to.value}} or ${type.path.to.value}
-    # Supports both {{...}} and ${...} syntax
+    # Pattern for placeholders: ${type.path.to.value} (preferred) or {{type.path.to.value}} (deprecated)
+    # Note: {{...}} syntax is deprecated in v4.1+, use ${...} instead
+    # Both syntaxes supported for backward compatibility
     PLACEHOLDER_PATTERN = re.compile(r"(?:\{\{([a-zA-Z0-9_\.]+)\}\}|\$\{([a-zA-Z0-9_\.]+)\})")
 
     def __init__(self):
@@ -79,7 +88,7 @@ class PlaceholderResolver:
         """
 
         def replace_placeholder(match):
-            # Get placeholder from either group ({{...}} or ${...})
+            # Get placeholder from either group (${...} preferred, {{...}} deprecated)
             placeholder = match.group(1) if match.group(1) else match.group(2)
 
             # Check cache first

@@ -41,8 +41,7 @@ const project = config.require("project");
 const environment = config.require("environment");
 const deploymentId = config.require("deploymentId");
 const pulumiOrg = config.require("pulumiOrg");
-const awsConfig = new pulumi.Config("aws");
-const region = awsConfig.require("region");
+const region = config.require("region");
 
 // Optional configuration
 const vpcCidr = config.get("vpcCidr") ?? "10.0.0.0/16";
@@ -87,12 +86,9 @@ function getResourceName(resourceType: string, suffix?: string): string {
 // Availability Zones
 // ============================================================================
 
-// Get available AZs for the region
-const availableAZs = aws.getAvailabilityZones({
-  state: "available"
-});
-
-const azs = availableAZs.then(zones => zones.names.slice(0, 2));
+// Fixed AZs for reliable deployment (v4.1 fix)
+// Using first 2 AZs in us-east-1 for predictable deployment
+const azs = [`${region}a`, `${region}b`];
 
 // ============================================================================
 // VPC Creation
@@ -131,28 +127,26 @@ const internetGateway = new aws.ec2.InternetGateway("internet-gateway", {
 // This prevents 504 Gateway Timeout errors (from Critical Fixes.1.md)
 const publicSubnets: aws.ec2.Subnet[] = [];
 
-azs.then(zones => {
-  zones.forEach((az, index) => {
-    const cidrBlock = `10.0.${index + 1}.0/24`;
-    const subnet = new aws.ec2.Subnet(`public-subnet-${index}`, {
-      vpcId: vpc.id,
-      cidrBlock: cidrBlock,
-      availabilityZone: az,
-      mapPublicIpOnLaunch: true, // CRITICAL: Enable auto-assign public IP
-      tags: {
-        ...defaultTags,
-        Name: getResourceName("public-subnet", az.slice(-2)),
-        Type: "Public",
-        Tier: "dmz",
-        AvailabilityZone: az,
-        CidrBlock: cidrBlock,
-        // CRITICAL TAG: Mark as suitable for ECS Fargate
-        "kubernetes.io/role/elb": "1",
-        Purpose: "ALB and ECS Fargate containers"
-      }
-    });
-    publicSubnets.push(subnet);
+azs.forEach((az, index) => {
+  const cidrBlock = `10.0.${index + 1}.0/24`;
+  const subnet = new aws.ec2.Subnet(`public-subnet-${index}`, {
+    vpcId: vpc.id,
+    cidrBlock: cidrBlock,
+    availabilityZone: az,
+    mapPublicIpOnLaunch: true, // CRITICAL: Enable auto-assign public IP
+    tags: {
+      ...defaultTags,
+      Name: getResourceName("public-subnet", az.slice(-2)),
+      Type: "Public",
+      Tier: "dmz",
+      AvailabilityZone: az,
+      CidrBlock: cidrBlock,
+      // CRITICAL TAG: Mark as suitable for ECS Fargate
+      "kubernetes.io/role/elb": "1",
+      Purpose: "ALB and ECS Fargate containers"
+    }
   });
+  publicSubnets.push(subnet);
 });
 
 // ============================================================================
@@ -161,26 +155,24 @@ azs.then(zones => {
 
 const privateSubnets: aws.ec2.Subnet[] = [];
 
-azs.then(zones => {
-  zones.forEach((az, index) => {
-    const cidrBlock = `10.0.${index + 10}.0/24`;
-    const subnet = new aws.ec2.Subnet(`private-subnet-${index}`, {
-      vpcId: vpc.id,
-      cidrBlock: cidrBlock,
-      availabilityZone: az,
-      mapPublicIpOnLaunch: false,
-      tags: {
-        ...defaultTags,
-        Name: getResourceName("private-subnet", az.slice(-2)),
-        Type: "Private",
-        Tier: "application",
-        AvailabilityZone: az,
-        CidrBlock: cidrBlock,
-        Purpose: "Internal resources and services"
-      }
-    });
-    privateSubnets.push(subnet);
+azs.forEach((az, index) => {
+  const cidrBlock = `10.0.${index + 10}.0/24`;
+  const subnet = new aws.ec2.Subnet(`private-subnet-${index}`, {
+    vpcId: vpc.id,
+    cidrBlock: cidrBlock,
+    availabilityZone: az,
+    mapPublicIpOnLaunch: false,
+    tags: {
+      ...defaultTags,
+      Name: getResourceName("private-subnet", az.slice(-2)),
+      Type: "Private",
+      Tier: "application",
+      AvailabilityZone: az,
+      CidrBlock: cidrBlock,
+      Purpose: "Internal resources and services"
+    }
   });
+  privateSubnets.push(subnet);
 });
 
 // ============================================================================
@@ -189,26 +181,24 @@ azs.then(zones => {
 
 const databaseSubnets: aws.ec2.Subnet[] = [];
 
-azs.then(zones => {
-  zones.forEach((az, index) => {
-    const cidrBlock = `10.0.${index + 20}.0/24`;
-    const subnet = new aws.ec2.Subnet(`database-subnet-${index}`, {
-      vpcId: vpc.id,
-      cidrBlock: cidrBlock,
-      availabilityZone: az,
-      mapPublicIpOnLaunch: false,
-      tags: {
-        ...defaultTags,
-        Name: getResourceName("database-subnet", az.slice(-2)),
-        Type: "Database",
-        Tier: "data",
-        AvailabilityZone: az,
-        CidrBlock: cidrBlock,
-        Purpose: "RDS and ElastiCache"
-      }
-    });
-    databaseSubnets.push(subnet);
+azs.forEach((az, index) => {
+  const cidrBlock = `10.0.${index + 20}.0/24`;
+  const subnet = new aws.ec2.Subnet(`database-subnet-${index}`, {
+    vpcId: vpc.id,
+    cidrBlock: cidrBlock,
+    availabilityZone: az,
+    mapPublicIpOnLaunch: false,
+    tags: {
+      ...defaultTags,
+      Name: getResourceName("database-subnet", az.slice(-2)),
+      Type: "Database",
+      Tier: "data",
+      AvailabilityZone: az,
+      CidrBlock: cidrBlock,
+      Purpose: "RDS and ElastiCache"
+    }
   });
+  databaseSubnets.push(subnet);
 });
 
 // ============================================================================
@@ -567,8 +557,8 @@ pulumi.log.info(`   Database Subnets: 10.0.20.0/24, 10.0.21.0/24 (2 AZs)`);
 pulumi.log.info(`   NAT Gateways: ${natCount} (${highAvailabilityNat ? 'HA mode' : 'Cost-optimized'})`);
 pulumi.log.info("");
 pulumi.log.info("🔗 Other stacks can reference this stack using:");
-pulumi.log.info(`   const networkStack = // v3.1 format: ${orgName}/${projectName}/${deploymentId}-${stackName}-${environment}
-    new pulumi.StackReference("${pulumiOrg}/network/${environment}-${deploymentId}");`);
+pulumi.log.info(`   const networkStack = // v4.1 format: ${pulumiOrg}/network/${deploymentId}-network-${environment}
+    new pulumi.StackReference("${pulumiOrg}/network/${deploymentId}-network-${environment}");`);
 pulumi.log.info(`   const vpcId = networkStack.getOutput("vpcId");`);
 pulumi.log.info(`   const publicSubnetIds = networkStack.getOutput("publicSubnetIds");`);
 pulumi.log.info("");

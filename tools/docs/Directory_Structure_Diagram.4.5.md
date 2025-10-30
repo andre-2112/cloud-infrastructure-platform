@@ -1,11 +1,11 @@
-# Directory Structure Diagram v4.1
+# Directory Structure Diagram v4.5
 
-**Version:** 4.1
-**Date:** 2025-10-29
+**Version:** 4.5
+**Date:** 2025-10-30
 **Status:** Production Ready
-**Architecture**: Aligned with v4.0 authoritative documents
+**Architecture**: Aligned with v4.0 authoritative documents, enhanced in v4.5
 
-**Changes from v3.1:**
+**Changes from v3.1 to v4.1:**
 - Updated to align with v4.0 authoritative documents
 - Clarified Python CLI implementation (cloud_cli)
 - Added core/CLI architecture split documentation
@@ -16,9 +16,16 @@
 - Added cross-stack dependency examples
 - Documented auto-extraction and validation systems
 
+**Changes from v4.1 to v4.5:**
+- Added Dynamic Pulumi.yaml Management system in core/pulumi
+- All deployment templates default to disabled stacks
+- Added Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md documentation
+- Updated pulumi_wrapper.py with deployment_context() method
+- Enhanced PulumiWrapper with backup/restore functionality
+
 ---
 
-## Directory Structure Diagram Reference, for Multi-Stack Architecture version 4.1
+## Directory Structure Diagram Reference, for Multi-Stack Architecture version 4.5
 
 <directory_structure>
 ```
@@ -32,9 +39,10 @@
 ├── tools/                                              # Platform Tools
 │   │
 │   ├── docs/                                           # Architecture Documentation
-│   │   ├── Multi_Stack_Architecture.4.1.md             # Main Architecture Document
-│   │   ├── Directory_Structure_Diagram.4.1.md          # This document
-│   │   ├── Deployment_Manifest_Specification.4.1.md
+│   │   ├── Multi_Stack_Architecture.4.5.md             # Main Architecture Document (v4.5)
+│   │   ├── Directory_Structure_Diagram.4.5.md          # This document (v4.5)
+│   │   ├── Deployment_Manifest_Specification.4.5.md    # Manifest spec (v4.5)
+│   │   ├── Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md  # Dynamic Pulumi.yaml (NEW v4.5)
 │   │   ├── README.md                                   # Documentation index (v4.1)
 │   │   ├── INSTALL.md                                  # Installation guide (v4.1)
 │   │   │
@@ -132,7 +140,7 @@
 │   │   │   │   ├── pulumi_validator.py                 # Pulumi validation
 │   │   │   │   └── aws_validator.py                    # AWS prerequisites
 │   │   │   ├── pulumi/                                 # Pulumi Integration
-│   │   │   │   ├── pulumi_wrapper.py                   # Pulumi CLI wrapper
+│   │   │   │   ├── pulumi_wrapper.py                   # Pulumi CLI wrapper (v4.5: deployment_context())
 │   │   │   │   ├── stack_operations.py                 # Stack operations
 │   │   │   │   └── state_queries.py                    # State queries
 │   │   │   └── utils/                                  # Utilities
@@ -525,11 +533,12 @@ TypeScript (./tools/cli/src/index.ts) →   Python (./tools/cli/src/cloud_cli/ma
 - **Enhanced templates** with structured parameter system
 - **Auto-extraction system** for automatic template generation
 - **Template-first validation** for code-template consistency
+- **Dynamic Pulumi.yaml management** (v4.5) for deployment-specific project naming
 
 ---
 
-**Document Version:** 4.1
-**Last Updated:** 2025-10-29
-**Architecture Version:** 4.1
-**Authoritative Documents:** Complete_Stack_Management_Guide_v4.md, Stack_Parameters_and_Registration_Guide_v4.md, Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md
-**Next Document:** Multi_Stack_Architecture.4.1.md
+**Document Version:** 4.5
+**Last Updated:** 2025-10-30
+**Architecture Version:** 4.5
+**Authoritative Documents:** Complete_Stack_Management_Guide_v4.md, Stack_Parameters_and_Registration_Guide_v4.md, Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md, Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md
+**Next Document:** Multi_Stack_Architecture.4.5.md

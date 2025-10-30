@@ -1,14 +1,14 @@
 # Cloud Infrastructure Orchestration Platform - Documentation Index
 
 **Platform:** cloud-0.7
-**Architecture Version:** 4.1
-**Last Updated:** 2025-10-29
+**Architecture Version:** 4.5
+**Last Updated:** 2025-10-30
 
 ---
 
 ## Welcome
 
-This is the master documentation index for the Cloud Infrastructure Orchestration Platform (cloud-0.7). This platform provides comprehensive tools for managing complex, interdependent AWS infrastructure deployments using Pulumi with a Python-based CLI and core business logic library.
+This is the master documentation index for the Cloud Infrastructure Orchestration Platform (cloud-0.7). This platform provides comprehensive tools for managing complex, interdependent AWS infrastructure deployments using Pulumi with a Python-based CLI, core business logic library, and dynamic Pulumi.yaml management (NEW in v4.5).
 
 ---
 
@@ -17,8 +17,8 @@ This is the master documentation index for the Cloud Infrastructure Orchestratio
 | Document | Description |
 |----------|-------------|
 | [INSTALL.md](INSTALL.md) | **Start here!** Complete installation and build guide for stacks and CLI |
-| [Multi_Stack_Architecture.4.1.md](Multi_Stack_Architecture.4.1.md) | Main architecture document - comprehensive platform overview (v4.1) |
-| [Directory_Structure_Diagram.4.1.md](Directory_Structure_Diagram.4.1.md) | Complete directory structure and organization (v4.1) |
+| [Multi_Stack_Architecture.4.5.md](Multi_Stack_Architecture.4.5.md) | Main architecture document - comprehensive platform overview (v4.5) |
+| [Directory_Structure_Diagram.4.5.md](Directory_Structure_Diagram.4.5.md) | Complete directory structure and organization (v4.5) |
 
 ---
 
@@ -35,15 +35,16 @@ These documents define the current, authoritative architecture:
 | [Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md](Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md) | 4.0 | 🔖 **Authoritative** - Template system and configuration flow |
 | [Implementation_Compliance_Report_v4.md](Implementation_Compliance_Report_v4.md) | 4.0 | Architecture compliance verification report |
 
-### Core Architecture Documents (v4.1)
+### Core Architecture Documents (v4.5)
 
-Updated to align with v4.0 authoritative documents:
+Updated to align with v4.0 authoritative documents, enhanced in v4.5:
 
 | Document | Version | Description |
 |----------|---------|-------------|
-| [Multi_Stack_Architecture.4.1.md](Multi_Stack_Architecture.4.1.md) | 4.1 | Complete architecture specification |
-| [Directory_Structure_Diagram.4.1.md](Directory_Structure_Diagram.4.1.md) | 4.1 | Directory structure reference |
-| [Deployment_Manifest_Specification.4.1.md](Deployment_Manifest_Specification.4.1.md) | 4.1 | Manifest file format and schema |
+| [Multi_Stack_Architecture.4.5.md](Multi_Stack_Architecture.4.5.md) | 4.5 | Complete architecture specification with dynamic Pulumi.yaml |
+| [Directory_Structure_Diagram.4.5.md](Directory_Structure_Diagram.4.5.md) | 4.5 | Directory structure reference |
+| [Deployment_Manifest_Specification.4.5.md](Deployment_Manifest_Specification.4.5.md) | 4.5 | Manifest file format with pulumiOrg/project fields |
+| [Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md](Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md) | 4.1 | **NEW v4.5:** Dynamic Pulumi.yaml management system |
 
 ---
 
@@ -107,15 +108,16 @@ Updated to align with v4.0 authoritative documents:
 ## Quick Navigation by Topic
 
 ### 🏗️ Architecture & Design
-- [Multi_Stack_Architecture.4.1.md](Multi_Stack_Architecture.4.1.md) - **Current architecture**
+- [Multi_Stack_Architecture.4.5.md](Multi_Stack_Architecture.4.5.md) - **Current architecture (v4.5)**
 - [Complete_Stack_Management_Guide_v4.md](Complete_Stack_Management_Guide_v4.md) - **Authoritative guide**
-- [Directory_Structure_Diagram.4.1.md](Directory_Structure_Diagram.4.1.md) - **Directory layout**
+- [Directory_Structure_Diagram.4.5.md](Directory_Structure_Diagram.4.5.md) - **Directory layout (v4.5)**
+- [Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md](Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md) - **Dynamic Pulumi.yaml (NEW v4.5)**
 - [Architecture_Inconsistency_Analysis_v3.1_to_v4.md](Architecture_Inconsistency_Analysis_v3.1_to_v4.md) - **v3.1 to v4.0 changes**
 
 ### 📦 Templates & Configuration
 - [Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md](Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md) - **Authoritative template guide**
 - [Stack_Parameters_and_Registration_Guide_v4.md](Stack_Parameters_and_Registration_Guide_v4.md) - **Enhanced templates**
-- [Deployment_Manifest_Specification.4.1.md](Deployment_Manifest_Specification.4.1.md) - **Manifest format**
+- [Deployment_Manifest_Specification.4.5.md](Deployment_Manifest_Specification.4.5.md) - **Manifest format (v4.5)**
 
 ### 💻 CLI Usage
 - [INSTALL.md](INSTALL.md) - Installation guide
@@ -211,7 +213,8 @@ cloud/
 
 | Version | Date | Changes |
 |---------|------|---------|
-| **4.1** | **2025-10-29** | **Aligned with v4.0 authoritative documents, Python CLI, enhanced templates** |
+| **4.5** | **2025-10-30** | **Dynamic Pulumi.yaml management, pulumiOrg/project fields, stacks disabled by default** |
+| 4.1 | 2025-10-29 | Aligned with v4.0 authoritative documents, Python CLI, enhanced templates |
 | 4.0 | 2025-10-28 | Template-first validation, auto-extraction, cross-stack dependencies |
 | 3.1 | 2025-10-21 | Updated Pulumi state management, stack naming, Python CLI |
 | 3.0 | 2025-10-08 | Template-based dependencies, smart deployment, layer execution |
@@ -219,7 +222,7 @@ cloud/
 
 ---
 
-## Architecture Highlights (v4.1)
+## Architecture Highlights (v4.5)
 
 ### Core/CLI Architecture
 
@@ -342,9 +345,9 @@ For questions or support, refer to the platform maintainers or open an issue on 
 ---
 
 **Platform:** cloud-0.7
-**Architecture:** 4.1
-**Total Documentation:** 20+ files (v4.1) + 16 files (legacy v3.1)
-**Last Updated:** 2025-10-29
-**Implementation Status:** ✅ 100% Architecture Compliant (v4.0)
+**Architecture:** 4.5
+**Total Documentation:** 21+ files (v4.5) + 16 files (legacy v3.1)
+**Last Updated:** 2025-10-30
+**Implementation Status:** ✅ 100% Architecture Compliant (v4.5)
 
 **End of Documentation Index**

@@ -1,10 +1,10 @@
-# Cloud Infrastructure Orchestration Platform v4.1
+# Cloud Infrastructure Orchestration Platform v4.5
 
-**Version:** 4.1
+**Version:** 4.5
 **Platform:** cloud-0.7
-**Date:** 2025-10-29
+**Date:** 2025-10-30
 **Status:** Complete Implementation Blueprint
-**Classification:** Production-Ready Architecture with Enhanced Template System, Auto-Extraction, and Template-First Validation
+**Classification:** Production-Ready Architecture with Enhanced Template System, Auto-Extraction, Template-First Validation, and Dynamic Pulumi.yaml Management
 
 **Changes from v3.1 to v4.1:**
 - **MAJOR:** Python-based CLI implementation (not TypeScript) using Typer framework
@@ -20,22 +20,34 @@
 - Enhanced cross-stack dependency validation
 - Improved manifest specification with better examples
 
+**Changes from v4.1 to v4.5:**
+- **MAJOR:** Dynamic Pulumi.yaml generation using context manager pattern
+- **MAJOR:** Deployment-specific project naming in Pulumi Cloud organization
+- **MAJOR:** All stacks disabled by default in deployment templates
+- Pulumi.yaml backup and restore mechanism with retry logic
+- Support for concurrent deployments with project-specific backups
+- Enhanced PulumiWrapper with deployment_context() method
+- Guaranteed Pulumi.yaml restoration after stack operations
+- Improved deployment organization: `{pulumiOrg}/{project}/{deployment-id}-{stack-name}-{environment}`
+
 **Alignment with v4.0 Authoritative Documents:**
-This document (v4.1) is fully aligned with the v4.0 authoritative documents:
+This document (v4.5) is fully aligned with and extends the v4.0 authoritative documents:
 - Complete_Stack_Management_Guide_v4.md
 - Stack_Parameters_and_Registration_Guide_v4.md
 - Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md
+- Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md (NEW in v4.5)
 
 ---
 
 ## Document Purpose
 
-This document serves as the **complete implementation blueprint** for the Cloud Infrastructure Orchestration Platform v4.1. It describes:
-- Complete architecture incorporating all enhancements from v2.3, v3.1, and v4.0
+This document serves as the **complete implementation blueprint** for the Cloud Infrastructure Orchestration Platform v4.5. It describes:
+- Complete architecture incorporating all enhancements from v2.3, v3.1, v4.0, and v4.5
 - **Core/CLI architecture split** with Python business logic library and CLI interface
 - **Enhanced template system** with structured parameters (inputs/outputs with types, defaults, validation)
 - **Auto-extraction system** for generating templates from TypeScript stack code
 - **Template-first validation** for ensuring code-template consistency
+- **Dynamic Pulumi.yaml management** with context manager pattern (NEW in v4.5)
 - Template-based deployment initialization system with stack dependencies
 - Centralized configuration management with runtime resolution (Pulumi native format)
 - Smart partial re-deployment with skip logic
@@ -61,37 +73,39 @@ This document serves as the **complete implementation blueprint** for the Cloud 
 1. [Executive Summary](#executive-summary)
 2. [Architecture Overview](#architecture-overview)
 3. [What's New in v4.1](#whats-new-in-v41)
-4. [Architecture Goals](#architecture-goals)
-5. [Core Concepts](#core-concepts)
-6. [Core/CLI Architecture](#corecli-architecture)
-7. [Directory Structure](#directory-structure)
-8. [Stack Management](#stack-management)
-9. [Template System](#template-system)
-10. [Enhanced Template System (v4.0+)](#enhanced-template-system-v40)
-11. [Auto-Extraction System (v4.0+)](#auto-extraction-system-v40)
-12. [Template-First Validation (v4.0+)](#template-first-validation-v40)
-13. [Deployment Initialization](#deployment-initialization)
-14. [Configuration Management](#configuration-management)
-15. [Multi-Environment Support](#multi-environment-support)
-16. [Dependency Resolution](#dependency-resolution)
-17. [Cross-Stack Dependencies (Complete Workflow)](#cross-stack-dependencies-complete-workflow)
-18. [Runtime Value Resolution](#runtime-value-resolution)
-19. [Deployment Orchestration](#deployment-orchestration)
-20. [State Management](#state-management)
-21. [CLI Tool Specification](#cli-tool-specification)
-22. [REST API Specification](#rest-api-specification)
-23. [Verification and Validation](#verification-and-validation)
-24. [Security and Access Control](#security-and-access-control)
-25. [Monitoring and Logging](#monitoring-and-logging)
-26. [Known Issues and Future Work](#known-issues-and-future-work)
-27. [Implementation Phases](#implementation-phases)
-28. [Migration from Architecture 3.1](#migration-from-architecture-31)
+4. [What's New in v4.5](#whats-new-in-v45)
+5. [Architecture Goals](#architecture-goals)
+6. [Core Concepts](#core-concepts)
+7. [Core/CLI Architecture](#corecli-architecture)
+8. [Directory Structure](#directory-structure)
+9. [Stack Management](#stack-management)
+10. [Template System](#template-system)
+11. [Enhanced Template System (v4.0+)](#enhanced-template-system-v40)
+12. [Auto-Extraction System (v4.0+)](#auto-extraction-system-v40)
+13. [Template-First Validation (v4.0+)](#template-first-validation-v40)
+14. [Dynamic Pulumi.yaml Management (v4.5+)](#dynamic-pulumiyaml-management-v45)
+15. [Deployment Initialization](#deployment-initialization)
+16. [Configuration Management](#configuration-management)
+17. [Multi-Environment Support](#multi-environment-support)
+18. [Dependency Resolution](#dependency-resolution)
+19. [Cross-Stack Dependencies (Complete Workflow)](#cross-stack-dependencies-complete-workflow)
+20. [Runtime Value Resolution](#runtime-value-resolution)
+21. [Deployment Orchestration](#deployment-orchestration)
+22. [State Management](#state-management)
+23. [CLI Tool Specification](#cli-tool-specification)
+24. [REST API Specification](#rest-api-specification)
+25. [Verification and Validation](#verification-and-validation)
+26. [Security and Access Control](#security-and-access-control)
+27. [Monitoring and Logging](#monitoring-and-logging)
+28. [Known Issues and Future Work](#known-issues-and-future-work)
+29. [Implementation Phases](#implementation-phases)
+30. [Migration from Architecture 3.1](#migration-from-architecture-31)
 
 ---
 
 ## Executive Summary
 
-The Cloud Infrastructure Orchestration Platform v4.1 is an enterprise-grade system for managing complex, interdependent AWS infrastructure deployments using Pulumi. Version 4.1 introduces significant enhancements focused on **Python-based implementation**, **enhanced template system with structured parameters**, **auto-extraction capabilities**, and **template-first validation**.
+The Cloud Infrastructure Orchestration Platform v4.5 is an enterprise-grade system for managing complex, interdependent AWS infrastructure deployments using Pulumi. Version 4.5 builds on v4.1's enhancements with **dynamic Pulumi.yaml management** for correct deployment-specific project naming in Pulumi Cloud organization structures.
 
 ### Key Capabilities
 
@@ -121,6 +135,15 @@ The Cloud Infrastructure Orchestration Platform v4.1 is an enterprise-grade syst
 - Validates all declared outputs are exported in code
 - Strict mode for enforcing complete consistency
 - Prevents drift between templates and implementations
+
+**Dynamic Pulumi.yaml Management (NEW in v4.5)**
+- Context manager pattern for temporary Pulumi.yaml modification
+- Automatic backup and restore of original Pulumi.yaml files
+- Deployment-specific project naming in Pulumi Cloud: `{pulumiOrg}/{project}/{deployment-id}-{stack-name}-{environment}`
+- Support for concurrent deployments with project-specific backup files
+- Retry logic for file operations (handles Windows file locking)
+- Guaranteed restoration even on errors or interruptions
+- Enables proper stack organization by business project in Pulumi Cloud
 
 **Enhanced Configuration Management (v4.0+)**
 - Pulumi native config format: `stackname:key: "value"`
@@ -656,6 +679,172 @@ All major features from v3.1 are preserved:
 - Multiple TypeScript files support
 - Cross-stack references with DependencyResolver
 - Multi-environment support (dev, stage, prod)
+
+---
+
+## What's New in v4.5
+
+### Major Enhancement from Architecture 4.1
+
+#### Dynamic Pulumi.yaml Management
+
+**The Problem:**
+
+In v4.1, the architecture specified that all stacks for a deployment should be organized under one Pulumi project named after the business project in Pulumi Cloud:
+
+```
+andre-2112/ecommerce/D1BRV40-network-dev
+andre-2112/ecommerce/D1BRV40-security-dev
+andre-2112/ecommerce/D1BRV40-database-dev
+```
+
+However, Pulumi validates the project name in CLI commands against the `name:` field in each stack directory's `Pulumi.yaml` file. Since all stack directories have hardcoded names (network, security, database-rds), this created a fundamental incompatibility:
+- Commands needed to use deployment project name: `pulumi up --stack andre-2112/ecommerce/D1BRV40-network-dev`
+- But Pulumi.yaml contained: `name: network` (stack type name)
+- Pulumi rejected operations with "project name doesn't match Pulumi.yaml"
+
+**The Solution:**
+
+v4.5 introduces **Dynamic Pulumi.yaml Management** using a context manager pattern:
+
+1. **Backup**: Before operations, backup original `Pulumi.yaml` with project-specific naming
+2. **Generate**: Create temporary `Pulumi.yaml` with deployment project name
+3. **Execute**: Run Pulumi operations with correct project context
+4. **Restore**: Always restore original `Pulumi.yaml`, even on errors
+
+**Implementation:**
+
+New methods in `PulumiWrapper` class (`tools/core/cloud_core/pulumi/pulumi_wrapper.py`):
+
+```python
+@contextmanager
+def deployment_context(self, stack_dir: Path, stack_name: str):
+    """
+    Context manager for deployment-specific Pulumi.yaml
+
+    Usage:
+        with pulumi_wrapper.deployment_context(stack_dir, "network"):
+            # Pulumi operations here use deployment project name
+            pulumi_wrapper.select_stack(...)
+            pulumi_wrapper.up(...)
+        # Original Pulumi.yaml automatically restored
+    """
+    backup_path = None
+    try:
+        backup_path = self._backup_pulumi_yaml(stack_dir)
+        self._generate_pulumi_yaml(stack_dir, stack_name)
+        yield
+    finally:
+        self._restore_pulumi_yaml(stack_dir, backup_path)
+```
+
+**Usage in Commands:**
+
+All deployment and destruction commands now use the context manager:
+
+```python
+# deploy_stack_cmd.py, destroy_stack_cmd.py, deploy_cmd.py
+with pulumi_wrapper.deployment_context(stack_dir, stack_name):
+    # Deploy or destroy within context
+    success, error = stack_ops.deploy_stack(
+        deployment_id=deployment_id,
+        stack_name=stack_name,
+        environment=environment,
+        stack_dir=stack_dir,
+        config=config,
+    )
+# Pulumi.yaml automatically restored here
+```
+
+**Key Features:**
+
+- **Retry Logic**: Handles Windows file locking with exponential backoff (1s, 2s)
+- **Concurrent Safety**: Project-specific backup naming prevents conflicts: `Pulumi.yaml.backup.{project}`
+- **Guaranteed Restoration**: Finally block ensures cleanup even on errors
+- **Preserved Metadata**: Keeps original runtime and description from stack Pulumi.yaml
+- **No Leftovers**: Cleans up stale backups from previous runs
+
+**Impact:**
+
+- ✅ Correct Pulumi Cloud organization structure by business project
+- ✅ Proper stack grouping: all stacks for one deployment under one project
+- ✅ Better organization and filtering in Pulumi Cloud dashboard
+- ✅ Supports concurrent deployments (different projects don't conflict)
+- ✅ Zero manual intervention required - fully automatic
+- ✅ Backward compatible - original Pulumi.yaml files unchanged
+
+**Before v4.5:**
+```
+andre-2112/network/D1BRV40-network-dev          # Wrong: scattered by stack type
+andre-2112/security/D1BRV40-security-dev
+andre-2112/database-rds/D1BRV40-database-dev
+```
+
+**After v4.5:**
+```
+andre-2112/ecommerce/D1BRV40-network-dev        # Correct: grouped by project
+andre-2112/ecommerce/D1BRV40-security-dev
+andre-2112/ecommerce/D1BRV40-database-dev
+```
+
+**Documentation:**
+
+Complete implementation details in: `tools/docs/Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md`
+
+### Template Changes in v4.5
+
+**All Stacks Disabled by Default**
+
+In v4.5, the default deployment template has been updated to disable all stacks by default:
+
+```yaml
+# tools/templates/default/default.yaml
+stacks:
+  network:
+    enabled: false  # Changed from true
+    layer: 1
+    dependencies: []
+```
+
+**Impact:**
+- Explicit opt-in model for stack deployment
+- Prevents accidental deployment of unnecessary infrastructure
+- Forces conscious decision-making about which stacks to enable
+- Better for production safety and cost control
+- Aligns with principle of least privilege
+
+**Usage:**
+
+Users must explicitly enable desired stacks when initializing deployments:
+
+```bash
+python -m cloud_cli.main init \
+  --template default \
+  --enable-stack network \
+  --enable-stack security \
+  --enable-stack storage
+```
+
+Or edit the generated deployment manifest to enable stacks:
+
+```yaml
+# deploy/D1BRV40-.../deployment-manifest.yaml
+stacks:
+  network:
+    enabled: true  # Manually enable
+```
+
+### Carried Forward from v4.1
+
+All features from v4.1 are preserved and enhanced:
+- Python-based Core/CLI architecture
+- Enhanced template system with structured parameters
+- Auto-extraction system for parameter discovery
+- Template-first validation for code consistency
+- Pulumi native config format
+- Simplified placeholder syntax
+- Config subdirectory organization
+- Updated stack naming convention
 
 ---
 
@@ -1269,70 +1458,138 @@ python -m cloud_cli.main init D1BRV40 --template default --org CompanyA --projec
 │   │   └── utils.ts                        # Common utilities
 │   │
 │   ├── dns/                                # DNS Stack
+│   │   ├── index.ts                        # Main entry point (AT ROOT)
+│   │   ├── src/                            # Optional component files
+│   │   │   ├── route53.ts                  # Route53 resources
+│   │   │   └── acm.ts                      # Certificate Manager
 │   │   ├── docs/                           # Stack documentation
-│   │   └── src/                            # Stack implementation
-│   │       ├── Pulumi.yaml                 # Minimal config
-│   │       ├── index.ts                    # Main program
-│   │       ├── route53.ts                  # Route53 resources
-│   │       ├── acm.ts                      # Certificate Manager
-│   │       ├── package.json
-│   │       └── tsconfig.json
+│   │   ├── Pulumi.yaml                     # Minimal config (at root)
+│   │   ├── package.json
+│   │   └── tsconfig.json
 │   │
 │   ├── network/                            # Network Stack
+│   │   ├── index.ts                        # Main entry point (AT ROOT)
+│   │   ├── src/                            # Optional component files
+│   │   │   ├── vpc.ts                      # VPC resources
+│   │   │   ├── subnets.ts                  # Subnet resources
+│   │   │   ├── routing.ts                  # Route tables
+│   │   │   ├── nat-gateway.ts              # NAT gateways
+│   │   │   └── endpoints.ts                # VPC endpoints
 │   │   ├── docs/
-│   │   └── src/
-│   │       ├── Pulumi.yaml
-│   │       ├── index.ts
-│   │       ├── vpc.ts                      # VPC resources
-│   │       ├── subnets.ts                  # Subnet resources
-│   │       ├── routing.ts                  # Route tables
-│   │       ├── nat-gateway.ts              # NAT gateways
-│   │       ├── endpoints.ts                # VPC endpoints
-│   │       ├── package.json
-│   │       └── tsconfig.json
+│   │   ├── Pulumi.yaml                     # Minimal config (at root)
+│   │   ├── package.json
+│   │   └── tsconfig.json
 │   │
 │   ├── security/                           # Security Stack
+│   │   ├── index.ts                        # Main entry point (AT ROOT)
+│   │   ├── src/                            # Optional component files
 │   │   ├── docs/
-│   │   └── src/
+│   │   ├── Pulumi.yaml
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
 │   ├── secrets/                            # Secrets Stack
+│   │   ├── index.ts
+│   │   ├── src/
 │   │   ├── docs/
-│   │   └── src/
+│   │   ├── Pulumi.yaml
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
 │   ├── authentication/                     # Authentication Stack
+│   │   ├── index.ts
+│   │   ├── src/
 │   │   ├── docs/
-│   │   └── src/
+│   │   ├── Pulumi.yaml
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
 │   ├── storage/                            # Storage Stack
+│   │   ├── index.ts
+│   │   ├── src/
 │   │   ├── docs/
-│   │   └── src/
+│   │   ├── Pulumi.yaml
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
 │   ├── database-rds/                       # Database Stack
+│   │   ├── index.ts
+│   │   ├── src/
 │   │   ├── docs/
-│   │   └── src/
+│   │   ├── Pulumi.yaml
+│   │   ├── package.json
+│   │   └── tsconfig.json
 │   ├── containers-images/                  # Container Images
+│   │   ├── index.ts
+│   │   ├── src/
 │   │   ├── docs/
-│   │   └── src/
+│   │   ├── Pulumi.yaml
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
 │   ├── containers-apps/                    # Container Apps
+│   │   ├── index.ts
+│   │   ├── src/
 │   │   ├── docs/
-│   │   └── src/
+│   │   ├── Pulumi.yaml
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
 │   ├── services-ecr/                       # ECR Stack
+│   │   ├── index.ts
+│   │   ├── src/
 │   │   ├── docs/
-│   │   └── src/
+│   │   ├── Pulumi.yaml
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
 │   ├── services-ecs/                       # ECS Stack
+│   │   ├── index.ts
+│   │   ├── src/
 │   │   ├── docs/
-│   │   └── src/
+│   │   ├── Pulumi.yaml
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
 │   ├── services-eks/                       # EKS Stack
+│   │   ├── index.ts
+│   │   ├── src/
 │   │   ├── docs/
-│   │   └── src/
+│   │   ├── Pulumi.yaml
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
 │   ├── services-api/                       # API Gateway Stack
+│   │   ├── index.ts
+│   │   ├── src/
 │   │   ├── docs/
-│   │   └── src/
+│   │   ├── Pulumi.yaml
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
 │   ├── compute-ec2/                        # EC2 Stack
+│   │   ├── index.ts
+│   │   ├── src/
 │   │   ├── docs/
-│   │   └── src/
+│   │   ├── Pulumi.yaml
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
 │   ├── compute-lambda/                     # Lambda Stack
+│   │   ├── index.ts
+│   │   ├── src/
 │   │   ├── docs/
-│   │   └── src/
+│   │   ├── Pulumi.yaml
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
 │   └── monitoring/                         # Monitoring Stack
+│       ├── index.ts
+│       ├── src/
 │       ├── docs/
-│       └── src/
+│       ├── Pulumi.yaml
+│       ├── package.json
+│       └── tsconfig.json
 │
 └── deploy/                                 # Active Deployments
     ├── D1BRV40-CompanyA-ecommerce/         # Deployment Example 1
@@ -2403,6 +2660,297 @@ python -m cloud_cli.main deploy D1BRV40 --environment dev
 7. Deploy if validation passes
 
 ---
+
+## Dynamic Pulumi.yaml Management (v4.5+)
+
+### Overview
+
+The Dynamic Pulumi.yaml Management system solves a fundamental incompatibility between Pulumi's validation requirements and the architecture's deployment-specific project naming strategy. It enables proper stack organization in Pulumi Cloud by business project while maintaining clean, reusable stack directories.
+
+**Key Innovation:** Context manager pattern for temporary Pulumi.yaml modification with guaranteed restoration.
+
+### The Problem
+
+**Architecture Requirement (v4.1):**
+All stacks for a deployment should be organized under one Pulumi project in Pulumi Cloud:
+```
+{pulumiOrg}/{project}/{deployment-id}-{stack-name}-{environment}
+andre-2112/ecommerce/D1BRV40-network-dev
+andre-2112/ecommerce/D1BRV40-security-dev
+andre-2112/ecommerce/D1BRV40-database-dev
+```
+
+**Pulumi Validation:**
+Pulumi CLI validates the project name in commands against the `name:` field in `Pulumi.yaml`:
+```yaml
+# stacks/network/Pulumi.yaml
+name: network  # Stack type name (hardcoded)
+runtime: nodejs
+```
+
+**The Conflict:**
+- Commands need deployment project: `pulumi up --stack andre-2112/ecommerce/D1BRV40-network-dev`
+- Pulumi.yaml contains stack type: `name: network`
+- Pulumi rejects: "error: provided project name 'ecommerce' doesn't match Pulumi.yaml"
+
+**Why Not Change Pulumi.yaml Permanently?**
+- Stack directories are shared across all deployments (99.9% disk space savings)
+- Changing `name:` to deployment project breaks other deployments
+- Need one stack directory (network) to serve hundreds of deployments
+
+### The Solution
+
+Dynamic generation of deployment-specific Pulumi.yaml during operations with automatic restoration.
+
+**Core Mechanism:**
+
+```python
+@contextmanager
+def deployment_context(self, stack_dir: Path, stack_name: str):
+    """
+    Temporarily modify Pulumi.yaml for deployment-specific operations
+
+    1. Backup original Pulumi.yaml (with project-specific name)
+    2. Generate temporary Pulumi.yaml (with deployment project name)
+    3. Execute Pulumi operations
+    4. Restore original Pulumi.yaml (guaranteed via finally block)
+    """
+    backup_path = None
+    try:
+        backup_path = self._backup_pulumi_yaml(stack_dir)
+        self._generate_pulumi_yaml(stack_dir, stack_name)
+        yield
+    finally:
+        self._restore_pulumi_yaml(stack_dir, backup_path)
+```
+
+### Implementation Details
+
+#### Backup Process (`_backup_pulumi_yaml`)
+
+**Location:** `tools/core/cloud_core/pulumi/pulumi_wrapper.py`
+
+**Features:**
+- Project-specific backup naming: `Pulumi.yaml.backup.{project}`
+- Cleans up stale backups from previous runs
+- Retry logic with exponential backoff (1s, 2s) for Windows file locking
+- Fails after 3 attempts with clear error message
+
+**Code:**
+```python
+def _backup_pulumi_yaml(self, stack_dir: Path) -> Optional[Path]:
+    pulumi_yaml = stack_dir / "Pulumi.yaml"
+    if not pulumi_yaml.exists():
+        logger.warning(f"No Pulumi.yaml found in {stack_dir}")
+        return None
+
+    # Project-specific backup prevents concurrent deployment conflicts
+    backup_path = stack_dir / f"Pulumi.yaml.backup.{self.project}"
+
+    # Clean up stale backup
+    if backup_path.exists():
+        logger.warning(f"Found stale backup {backup_path}, removing")
+        backup_path.unlink()
+
+    # Retry with exponential backoff
+    for attempt in range(3):
+        try:
+            shutil.copy2(pulumi_yaml, backup_path)
+            logger.debug(f"Backed up Pulumi.yaml to {backup_path}")
+            return backup_path
+        except (PermissionError, IOError) as e:
+            if attempt < 2:
+                wait_time = 2 ** attempt
+                logger.warning(f"Backup failed, retrying in {wait_time}s: {e}")
+                time.sleep(wait_time)
+            else:
+                raise PulumiError(f"Cannot backup Pulumi.yaml after 3 attempts: {e}")
+```
+
+#### Generation Process (`_generate_pulumi_yaml`)
+
+**Features:**
+- Preserves original `runtime` and `description` metadata
+- Uses deployment project name for `name:` field
+- Standard YAML format compatible with Pulumi
+- Handles missing or corrupted original files gracefully
+
+**Code:**
+```python
+def _generate_pulumi_yaml(self, stack_dir: Path, stack_name: str) -> None:
+    pulumi_yaml = stack_dir / "Pulumi.yaml"
+
+    # Read original to preserve runtime and description
+    original_content = {}
+    if pulumi_yaml.exists():
+        try:
+            with open(pulumi_yaml, 'r') as f:
+                original_content = yaml.safe_load(f) or {}
+        except Exception as e:
+            logger.warning(f"Could not read original Pulumi.yaml: {e}")
+
+    # Generate with deployment project name
+    new_content = {
+        'name': self.project,  # Deployment project (e.g., "ecommerce")
+        'runtime': original_content.get('runtime', 'nodejs'),
+        'description': original_content.get('description', f'{stack_name} stack'),
+    }
+
+    try:
+        with open(pulumi_yaml, 'w') as f:
+            yaml.safe_dump(new_content, f, default_flow_style=False)
+        logger.info(f"Generated Pulumi.yaml with project: {self.project}")
+    except Exception as e:
+        raise PulumiError(f"Cannot generate Pulumi.yaml: {e}")
+```
+
+#### Restoration Process (`_restore_pulumi_yaml`)
+
+**Features:**
+- Best-effort restoration (doesn't raise exceptions)
+- Retry logic for file operations
+- Logs errors but doesn't fail (cleanup context)
+- Uses `shutil.move()` for atomic operation
+
+**Code:**
+```python
+def _restore_pulumi_yaml(self, stack_dir: Path, backup_path: Optional[Path]) -> None:
+    if not backup_path or not backup_path.exists():
+        return
+
+    pulumi_yaml = stack_dir / "Pulumi.yaml"
+
+    # Retry up to 3 times
+    for attempt in range(3):
+        try:
+            shutil.move(str(backup_path), str(pulumi_yaml))
+            logger.debug(f"Restored Pulumi.yaml from backup")
+            return
+        except (PermissionError, IOError) as e:
+            if attempt < 2:
+                wait_time = 2 ** attempt
+                logger.warning(f"Restore failed, retrying in {wait_time}s: {e}")
+                time.sleep(wait_time)
+            else:
+                # Don't raise - we're in cleanup, best effort only
+                logger.error(f"Cannot restore Pulumi.yaml after 3 attempts: {e}")
+```
+
+### Usage Pattern
+
+**All deployment and destruction commands use the context manager:**
+
+```python
+# deploy_stack_cmd.py (line 129-140)
+# destroy_stack_cmd.py (line 106-115)
+# deploy_cmd.py (line 206-217)
+
+with pulumi_wrapper.deployment_context(stack_dir, stack_name):
+    # All Pulumi operations within this context use deployment project name
+    success, error = stack_ops.deploy_stack(
+        deployment_id=deployment_id,
+        stack_name=stack_name,
+        environment=environment,
+        stack_dir=stack_dir,
+        config=config,
+    )
+# Original Pulumi.yaml automatically restored here by context manager
+```
+
+### Concurrent Deployment Safety
+
+**Problem:** Multiple deployments running simultaneously could conflict.
+
+**Solution:** Project-specific backup file naming.
+
+**Example:**
+```
+# Deployment 1 (project: ecommerce)
+stacks/network/Pulumi.yaml.backup.ecommerce
+
+# Deployment 2 (project: analytics) running concurrently
+stacks/network/Pulumi.yaml.backup.analytics
+
+# No conflicts - each deployment has its own backup
+```
+
+### Error Handling
+
+**Guaranteed Restoration:**
+- `finally` block ensures restoration even on exceptions
+- Errors during deployment don't leave stale generated files
+- Interruptions (Ctrl+C) trigger cleanup via context manager exit
+
+**Retry Logic:**
+- Handles Windows file locking issues
+- Exponential backoff: 1s, 2s (total 3 attempts)
+- Clear error messages for debugging
+
+**Stale Backup Cleanup:**
+- Detects leftover backups from crashed runs
+- Automatically removes before creating new backup
+- Prevents accumulation of backup files
+
+### Benefits
+
+1. **Correct Pulumi Cloud Organization:**
+   - All stacks for a deployment grouped under one project
+   - Easier filtering, searching, and management
+   - Better dashboard organization
+
+2. **Shared Stack Directories:**
+   - Maintains 99.9% disk space savings
+   - One stack implementation serves hundreds of deployments
+   - No duplication of stack code
+
+3. **Zero Manual Intervention:**
+   - Fully automatic backup and restore
+   - No user action required
+   - Transparent to deployment operations
+
+4. **Concurrent Deployment Support:**
+   - Multiple deployments don't conflict
+   - Project-specific backup naming
+   - Safe for CI/CD parallelization
+
+5. **Backward Compatible:**
+   - Original Pulumi.yaml files unchanged
+   - Existing deployments continue working
+   - No migration required
+
+### Verification
+
+**Check Original Pulumi.yaml Preserved:**
+```bash
+cat cloud/stacks/network/Pulumi.yaml
+# Output should show:
+# name: network  (stack type, not deployment project)
+# runtime: nodejs
+# description: Network infrastructure stack
+```
+
+**Check No Backup Files Left:**
+```bash
+ls -la cloud/stacks/network/Pulumi.yaml.backup.*
+# Output should show: No such file or directory
+```
+
+**Check Correct Pulumi Cloud Organization:**
+```bash
+pulumi stack ls --all
+# Output should show:
+# andre-2112/ecommerce/D1BRV40-network-dev     (grouped by project)
+# andre-2112/ecommerce/D1BRV40-security-dev
+# andre-2112/analytics/D2XYZ89-network-dev     (different project)
+```
+
+### Further Reading
+
+Complete implementation details, edge cases, and testing strategy documented in:
+`tools/docs/Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md`
+
+---
+
 ## Deployment Initialization
 
 ### Initialization Overview

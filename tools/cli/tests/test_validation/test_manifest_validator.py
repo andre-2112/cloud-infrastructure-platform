@@ -2,7 +2,7 @@
 
 import pytest
 from pathlib import Path
-from cloud_cli.validation.manifest_validator import ManifestValidator, DeploymentManifest
+from cloud_core.validation.manifest_validator import ManifestValidator, DeploymentManifest
 from pydantic import ValidationError
 
 

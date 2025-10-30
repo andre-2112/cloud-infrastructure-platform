@@ -82,7 +82,7 @@ class StackCodeValidator:
 
         try:
             # Import here to avoid circular dependency
-            from ...cli.parser.parameter_extractor import ParameterExtractor
+            from cloud_cli.parser.parameter_extractor import ParameterExtractor
 
             # Extract parameters from code
             extractor = ParameterExtractor()

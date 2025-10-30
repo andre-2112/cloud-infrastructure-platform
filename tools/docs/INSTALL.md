@@ -1,8 +1,8 @@
 # Installation and Build Guide
 
 **Platform:** cloud-0.7
-**Architecture:** 4.1
-**Last Updated:** 2025-10-29
+**Architecture:** 4.5
+**Last Updated:** 2025-10-30
 
 ---
 
@@ -410,12 +410,80 @@ python -m cloud_cli.main --version
 # Expected output:
 # Cloud Infrastructure Orchestration Platform CLI
 # Version: 0.7.0
-# Architecture: 4.1
+# Architecture: 4.5
 # Python: 3.13.x
-
-# Or using cloud-cli command (if installed globally)
-cloud-cli --version
 ```
+
+**6. Setup PATH for direct `cloud` command usage (Recommended):**
+
+The `cloud` command is installed in Python's Scripts directory. To use `cloud` directly instead of `python -m cloud_cli.main`, add the Scripts directory to your PATH.
+
+**For Windows (Git Bash / MINGW64):**
+
+```bash
+# Find where cloud.exe is installed
+find /c/Users/$USER/AppData/Roaming/Python -name "cloud.exe" 2>/dev/null
+
+# Add to .bashrc for permanent access
+echo 'export PATH="/c/Users/'$USER'/AppData/Roaming/Python/Python313/Scripts:$PATH"' >> ~/.bashrc
+
+# Reload .bashrc
+source ~/.bashrc
+
+# Verify cloud command works
+cloud --help
+```
+
+**For Linux/macOS:**
+
+```bash
+# Find where cloud is installed
+which cloud || find ~/.local -name "cloud" 2>/dev/null
+
+# Add to .bashrc or .zshrc
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc  # or ~/.zshrc
+
+# Reload shell configuration
+source ~/.bashrc  # or source ~/.zshrc
+
+# Verify cloud command works
+cloud --help
+```
+
+**For Windows (PowerShell - Permanent):**
+
+```powershell
+# Get Python Scripts path
+$scriptsPath = python -c "import site; print(site.USER_SITE.replace('site-packages', 'Scripts'))"
+
+# Add to PATH permanently (requires admin)
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";$scriptsPath", "User")
+
+# Reload environment
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path", "User")
+
+# Verify
+cloud --help
+```
+
+**Testing PATH Setup:**
+
+```bash
+# Test the cloud command
+cloud --help
+
+# If successful, you can now use:
+cloud init --help
+cloud deploy --help
+cloud status --help
+
+# Instead of:
+python -m cloud_cli.main init --help
+python -m cloud_cli.main deploy --help
+python -m cloud_cli.main status --help
+```
+
+**Note:** If `cloud --help` fails with "command not found", the PATH setup is incomplete. Use the full Python module invocation as a fallback: `python -m cloud_cli.main`
 
 ### Alternative: Global Installation
 
@@ -841,7 +909,7 @@ See [INSTALL_v4.1_additions.md](INSTALL_v4.1_additions.md) for complete auto-ext
 
 ---
 
-**Document Version:** 4.1
-**Last Updated:** 2025-10-29
+**Document Version:** 4.5
+**Last Updated:** 2025-10-30
 **Platform:** cloud-0.7
-**Architecture:** 4.1
+**Architecture:** 4.5

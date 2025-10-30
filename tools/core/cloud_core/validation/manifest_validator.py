@@ -1,7 +1,7 @@
 """
 Manifest Validator
 
-Validates deployment manifest syntax and structure according to Architecture 3.1
+Validates deployment manifest syntax and structure according to Architecture 4.1
 """
 
 from pathlib import Path
@@ -28,14 +28,14 @@ class EnvironmentConfig(BaseModel):
 
 
 class DeploymentManifest(BaseModel):
-    """Deployment manifest structure"""
+    """Deployment manifest structure for v4.1"""
 
-    version: str = Field(..., pattern=r"^3\.\d+$", description="Architecture version")
+    version: str = Field(default="4.1", pattern=r"^4\.\d+$", description="Architecture version")
     deployment_id: str = Field(..., pattern=r"^D[A-Z0-9]{6}$", description="Deployment ID")
     organization: str = Field(..., min_length=1, description="Organization name")
     project: str = Field(..., min_length=1, description="Project name")
     domain: str = Field(..., description="Primary domain")
-    template: str = Field(..., description="Template name")
+    template: str = Field(default="custom", description="Template name (optional)")
 
     environments: Dict[str, EnvironmentConfig] = Field(
         ..., description="Environment configurations"
@@ -102,19 +102,17 @@ class ManifestValidator:
         return len(self.errors) == 0
 
     def _validate_basic_structure(self, data: Dict[str, Any]) -> bool:
-        """Validate basic manifest structure"""
-        # Check for required top-level keys
-        if "deployment" not in data:
-            self.errors.append("Missing required field: deployment")
-            return False
-
-        deployment = data["deployment"]
-
-        # Check required deployment fields
-        required_fields = ["id", "org", "project", "domain", "region"]
+        """Validate basic manifest structure (v4.1 flat format)"""
+        # Check for required top-level keys (v4.1 flat format)
+        required_fields = ["deployment_id", "organization", "project", "domain"]
         for field in required_fields:
-            if field not in deployment:
-                self.errors.append(f"Missing required field: deployment.{field}")
+            if field not in data:
+                self.errors.append(f"Missing required field: {field}")
+
+        # Check for environments
+        if "environments" not in data:
+            self.errors.append("Missing required field: environments")
+            return False
 
         # Check for stacks
         if "stacks" not in data:

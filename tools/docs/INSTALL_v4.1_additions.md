@@ -1,4 +1,4 @@
-# INSTALL.md v4.1 - Additional Sections
+# INSTALL.md v4.5 - Additional Sections
 
 These sections should be added to INSTALL.md after the "Testing and Running the CLI" section.
 
@@ -266,9 +266,9 @@ echo "✓ All integration tests passed"
 ---
 
 **For full documentation, see:**
-- [Multi_Stack_Architecture.4.1.md](Multi_Stack_Architecture.4.1.md) - Complete architecture
+- [Multi_Stack_Architecture.4.5.md](Multi_Stack_Architecture.4.5.md) - Complete architecture
 - [Stack_Parameters_and_Registration_Guide_v4.md](Stack_Parameters_and_Registration_Guide_v4.md) - Template system details
 - [Complete_Stack_Management_Guide_v4.md](Complete_Stack_Management_Guide_v4.md) - Complete workflow guide
 
-**Document Version:** 4.1
-**Last Updated:** 2025-10-29
+**Document Version:** 4.5
+**Last Updated:** 2025-10-30

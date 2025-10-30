@@ -16,8 +16,8 @@ console = Console()
 logger = get_logger(__name__)
 
 
-@app.command(name="status")
-def status_command(
+@app.command()
+def status(
     deployment_id: str = typer.Argument(..., help="Deployment ID"),
     environment: str = typer.Option(
         "dev", "--environment", "-e", help="Environment"

@@ -1,3 +1,4 @@
+from cloud_cli.utils.console_utils import safe_print
 """
 Stack Management Commands
 
@@ -135,7 +136,7 @@ def register_stack_command(
             overwrite=True
         )
 
-        console.print(f"[green]✓[/green] Stack '{stack_name}' registered successfully")
+        safe_print(console, f"[green]✓[/green] Stack '{stack_name}' registered successfully")
         console.print(f"  Template: {template_file}")
         console.print(f"  Dependencies: {', '.join(deps) if deps else 'none'}")
         console.print(f"  Priority: {priority}")
@@ -150,9 +151,9 @@ def register_stack_command(
             result = validator.validate(stack_dir, template_data, stack_name, strict)
 
             if result.valid:
-                console.print(f"[green]✓ Validation passed[/green]")
+                safe_print(console, f"[green]✓ Validation passed[/green]")
             else:
-                console.print(f"[red]✗ Validation failed[/red]")
+                safe_print(console, f"[red]✗ Validation failed[/red]")
 
             if result.warnings:
                 console.print(f"[yellow]Warnings: {len(result.warnings)}[/yellow]")
@@ -162,7 +163,7 @@ def register_stack_command(
             if result.errors:
                 console.print(f"[red]Errors: {len(result.errors)}[/red]")
                 for issue in result.errors[:5]:  # Show first 5
-                    console.print(f"  ✗ {issue.message}")
+                    safe_print(console, f"  ✗ {issue.message}")
 
     except Exception as e:
         console.print(f"[red]Error:[/red] {e}")
@@ -248,7 +249,7 @@ def update_stack_command(
         with open(template_file, 'w') as f:
             yaml.dump(data, f, default_flow_style=False, sort_keys=False)
 
-        console.print(f"[green]✓[/green] Stack '{stack_name}' updated successfully")
+        safe_print(console, f"[green]✓[/green] Stack '{stack_name}' updated successfully")
 
     except Exception as e:
         console.print(f"[red]Error:[/red] {e}")
@@ -279,7 +280,7 @@ def unregister_stack_command(
         # Remove template file
         template_file.unlink()
 
-        console.print(f"[green]✓[/green] Stack '{stack_name}' unregistered successfully")
+        safe_print(console, f"[green]✓[/green] Stack '{stack_name}' unregistered successfully")
 
     except Exception as e:
         console.print(f"[red]Error:[/red] {e}")
@@ -307,8 +308,8 @@ def validate_stack_command(
             console.print(f"[red]Error:[/red] Stack directory not found: {stack_dir}")
             raise typer.Exit(1)
 
-        basic_errors = []
-        basic_warnings = []
+        basic_errors: list[str] = []
+        basic_warnings: list[str] = []
 
         # Check required files if requested
         if check_files:
@@ -325,12 +326,12 @@ def validate_stack_command(
             console.print("\nSkipping template validation (no template found)")
 
             if basic_errors:
-                console.print(f"\n[red]✗ Basic validation failed:[/red]")
+                safe_print(console, f"\n[red]✗ Basic validation failed:[/red]")
                 for error in basic_errors:
-                    console.print(f"  ✗ {error}")
+                    safe_print(console, f"  ✗ {error}")
                 raise typer.Exit(1)
 
-            console.print(f"[green]✓ Basic file structure is valid[/green]")
+            safe_print(console, f"[green]✓ Basic file structure is valid[/green]")
             return
 
         # Load template
@@ -338,9 +339,9 @@ def validate_stack_command(
 
         # Report basic issues first
         if basic_errors:
-            console.print(f"[red]✗ Basic validation failed:[/red]")
+            safe_print(console, f"[red]✗ Basic validation failed:[/red]")
             for error in basic_errors:
-                console.print(f"  ✗ {error}")
+                safe_print(console, f"  ✗ {error}")
             console.print("\nFix basic issues before template validation")
             raise typer.Exit(1)
 
@@ -352,19 +353,19 @@ def validate_stack_command(
         # Display results
         console.print("\n" + "=" * 60)
         if result.valid and not result.has_issues():
-            console.print(f"[green]✓ Stack '{stack_name}' is valid[/green]")
+            safe_print(console, f"[green]✓ Stack '{stack_name}' is valid[/green]")
             console.print("  Code matches template declarations")
         elif result.valid and result.warnings:
-            console.print(f"[green]✓ Stack '{stack_name}' is valid (with warnings)[/green]")
+            safe_print(console, f"[green]✓ Stack '{stack_name}' is valid (with warnings)[/green]")
         else:
-            console.print(f"[red]✗ Stack '{stack_name}' validation failed[/red]")
+            safe_print(console, f"[red]✗ Stack '{stack_name}' validation failed[/red]")
 
         # Show errors
         if result.errors:
             console.print(f"\n[red]Errors ({len(result.errors)}):[/red]")
             for issue in result.errors:
                 location = f" [{issue.location}]" if issue.location else ""
-                console.print(f"  ✗ {issue.message}{location}")
+                safe_print(console, f"  ✗ {issue.message}{location}")
 
         # Show warnings
         if result.warnings:

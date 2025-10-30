@@ -1,3 +1,4 @@
+from cloud_cli.utils.console_utils import safe_print
 """
 Destroy Command
 
@@ -98,13 +99,19 @@ def destroy_command(
         state_manager = StateManager(deployment_dir)
         state_manager.start_operation("destroy", environment)
 
+        # Initialize PulumiWrapper with required parameters
+        # Use pulumiOrg (Pulumi Cloud organization), NOT organization (deployment org)
+        pulumi_org = manifest.get("pulumiOrg", manifest.get("organization", ""))
+        project = manifest.get("project", deployment_id)
+        pulumi_wrapper = PulumiWrapper(organization=pulumi_org, project=project)
+
         async def run_destroy():
             try:
                 await orchestrator.execute_destroy(
                     plan=plan,
                     deployment_id=deployment_id,
                     environment=environment,
-                    pulumi_wrapper=PulumiWrapper(),
+                    pulumi_wrapper=pulumi_wrapper,
                     state_manager=state_manager,
                 )
                 return True
@@ -116,10 +123,10 @@ def destroy_command(
 
         if success:
             state_manager.complete_operation("destroy", success=True)
-            console.print(f"\n[green]✓[/green] Deployment {deployment_id} ({environment}) destroyed successfully")
+            safe_print(console, f"\n[green]✓[/green] Deployment {deployment_id} ({environment}) destroyed successfully")
         else:
             state_manager.complete_operation("destroy", success=False)
-            console.print(f"\n[red]✗[/red] Destroy failed - see logs for details")
+            safe_print(console, f"\n[red]✗[/red] Destroy failed - see logs for details")
             raise typer.Exit(1)
 
     except Exception as e:

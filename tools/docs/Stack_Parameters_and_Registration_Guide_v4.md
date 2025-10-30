@@ -1,9 +1,9 @@
 # Stack Parameters and Registration - Complete Guide v4
 
 **Platform:** cloud-0.7
-**Architecture:** 3.1 Enhanced
-**Date:** 2025
-**Version:** 4.0 (With Cross-Stack Dependencies)
+**Architecture:** 4.5
+**Date:** 2025-10-30
+**Version:** 4.5 (With Cross-Stack Dependencies and Dynamic Pulumi.yaml)
 **Status:** ✅ Fully Implemented (87% Coverage)
 
 ---
@@ -1797,9 +1797,9 @@ cloud deploy D1TEST1 -e dev --validate-code
 
 ---
 
-## End of Guide v2
+## End of Guide v4.5
 
-**Version:** 2.0
+**Version:** 4.5
 **Status:** Fully Implemented
 **Coverage:** 87%
 **Tests:** 422 passing

@@ -8,11 +8,13 @@ import typer
 from rich.console import Console
 from pathlib import Path
 
-from cloud_core.deployment import DeploymentManager, StateManager
+from cloud_core.deployment import DeploymentManager, StateManager, StackStatus
 from cloud_core.orchestrator import DependencyResolver
 from cloud_core.pulumi import PulumiWrapper, StackOperations
 from cloud_core.validation import ManifestValidator
 from cloud_core.utils.logger import get_logger
+from cloud_cli.utils.path_utils import get_stacks_dir
+from cloud_cli.utils.console_utils import safe_print
 
 app = typer.Typer()
 console = Console()
@@ -40,7 +42,7 @@ def destroy_stack_command(
         deployment_manager = DeploymentManager()
         deployment_dir = deployment_manager.get_deployment_dir(deployment_id)
 
-        if not deployment_dir.exists():
+        if deployment_dir is None or not deployment_dir.exists():
             console.print(f"[red]Error:[/red] Deployment {deployment_id} not found")
             raise typer.Exit(1)
 
@@ -86,33 +88,42 @@ def destroy_stack_command(
         console.print(f"\n[bold]Destroying stack {stack_name} ({environment})...[/bold]")
 
         state_manager = StateManager(deployment_dir)
-        state_manager.update_stack_state(stack_name, environment, "destroying")
+        state_manager.set_stack_status(stack_name, StackStatus.DESTROYING, environment)
 
-        pulumi_wrapper = PulumiWrapper()
+        # Get Pulumi organization (NOT deployment organization) and project from manifest
+        # pulumiOrg is the Pulumi Cloud organization (e.g., "andre-2112")
+        # project is the deployment project name per v4.1 architecture
+        pulumi_org = manifest.get("pulumiOrg", manifest.get("organization", ""))
+        project = manifest.get("project", deployment_id)  # Use deployment project name
+
+        pulumi_wrapper = PulumiWrapper(organization=pulumi_org, project=project)
         stack_ops = StackOperations(pulumi_wrapper)
 
         try:
             # Get stack directory
-            stack_dir = Path.cwd() / "stacks" / stack_name
+            stack_dir = get_stacks_dir() / stack_name
 
-            # Destroy
-            result = stack_ops.destroy(
-                deployment_id=deployment_id,
-                stack_name=stack_name,
-                environment=environment,
-                work_dir=str(stack_dir),
-            )
+            # Use deployment context for Pulumi.yaml management
+            with pulumi_wrapper.deployment_context(stack_dir, stack_name):
+                # Destroy within context
+                success, error = stack_ops.destroy_stack(
+                    deployment_id=deployment_id,
+                    stack_name=stack_name,
+                    environment=environment,
+                    stack_dir=stack_dir,
+                )
+            # Pulumi.yaml automatically restored here
 
-            if result["success"]:
-                state_manager.update_stack_state(stack_name, environment, "destroyed")
-                console.print(f"\n[green]✓[/green] Stack {stack_name} destroyed successfully")
+            if success:
+                state_manager.set_stack_status(stack_name, StackStatus.DESTROYED, environment)
+                safe_print(console, f"\n[green]✓[/green] Stack {stack_name} destroyed successfully")
             else:
-                state_manager.update_stack_state(stack_name, environment, "failed")
-                console.print(f"\n[red]✗[/red] Stack destruction failed")
+                state_manager.set_stack_status(stack_name, StackStatus.FAILED, environment)
+                safe_print(console, f"\n[red]✗[/red] Stack destruction failed: {error}")
                 raise typer.Exit(1)
 
         except Exception as e:
-            state_manager.update_stack_state(stack_name, environment, "failed")
+            state_manager.set_stack_status(stack_name, StackStatus.FAILED, environment)
             raise e
 
     except Exception as e:

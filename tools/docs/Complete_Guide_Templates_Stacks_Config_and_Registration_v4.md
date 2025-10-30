@@ -1,9 +1,9 @@
 # Complete Guide: Templates, Stacks, Configuration, and Registration v4
 
 **Platform:** cloud-0.7
-**Architecture:** 3.1 Enhanced
-**Version:** 4.0 (With Cross-Stack Dependencies)
-**Date:** 2025
+**Architecture:** 4.5
+**Version:** 4.5 (With Cross-Stack Dependencies and Dynamic Pulumi.yaml)
+**Date:** 2025-10-30
 **Status:** ✅ With Output Support, Validation, and Cross-Stack Dependencies
 
 ---
@@ -1809,9 +1809,9 @@ parameters:
 
 ---
 
-## End of Guide v2
+## End of Guide v4.5
 
-**Version:** 2.0 (Enhanced)
+**Version:** 4.5 (Enhanced)
 **Status:** Fully Implemented
 **Coverage:** 87%
 **Features:** Auto-extraction, Output support, Validation

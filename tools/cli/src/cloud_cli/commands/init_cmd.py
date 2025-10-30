@@ -13,14 +13,15 @@ from cloud_core.deployment import DeploymentManager
 from cloud_core.templates import TemplateManager
 from cloud_core.utils.deployment_id import generate_deployment_id, validate_deployment_id
 from cloud_core.utils.logger import get_logger
+from cloud_cli.utils.console_utils import safe_print
 
 app = typer.Typer()
 console = Console()
 logger = get_logger(__name__)
 
 
-@app.command(name="init")
-def init_command(
+@app.command()
+def init(
     deployment_id: Optional[str] = typer.Argument(
         None, help="Deployment ID (auto-generated if not provided)"
     ),
@@ -95,9 +96,7 @@ def init_command(
             deployment_id=deployment_id,
         )
 
-        console.print(
-            f"[green]✓[/green] Deployment created successfully at:"
-        )
+        safe_print(console, f"[green]✓[/green] Deployment created successfully at:")
         console.print(f"  {deployment_dir}")
         console.print()
         console.print("[bold]Next steps:[/bold]")

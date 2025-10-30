@@ -108,7 +108,7 @@ class ParameterExtractor:
         Returns:
             Dictionary in template format with inputs and outputs
         """
-        template = {
+        template: Dict[str, Dict] = {
             "inputs": {},
             "outputs": {}
         }
@@ -245,7 +245,7 @@ class ParameterExtractor:
         extracted_params = extraction["parameters"]
         template_params = template.get("parameters", {})
 
-        differences = {
+        differences: Dict[str, List] = {
             "missing_in_template": [],
             "missing_in_code": [],
             "type_mismatches": [],
