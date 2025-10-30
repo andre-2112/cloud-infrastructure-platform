@@ -32,38 +32,41 @@ class StackOperations:
         stack_dir: Path,
         config: Dict[str, str],
         preview_only: bool = False,
+        config_file: Optional[Path] = None,
     ) -> tuple[bool, Optional[str]]:
         """
         Deploy a stack
 
         Args:
-            deployment_id: Deployment ID
+            deployment_id: Deployment ID (included in composite project name)
             stack_name: Stack name
             environment: Environment
             stack_dir: Path to stack directory
             config: Configuration values
             preview_only: If True, only preview changes
+            config_file: Path to config file (optional)
 
         Returns:
             Tuple of (success, error_message)
         """
-        # Construct Pulumi stack name
-        pulumi_stack_name = f"{deployment_id}-{stack_name}-{environment}"
+        # Construct Pulumi stack name (deployment_id is in composite project, not here)
+        pulumi_stack_name = f"{stack_name}-{environment}"
 
         try:
             # Select/create stack
             self.pulumi.select_stack(pulumi_stack_name, create=True, cwd=stack_dir)
 
-            # Set configuration
-            self.pulumi.set_all_config(config, cwd=stack_dir)
+            # Set configuration (only if no config file provided)
+            if not config_file:
+                self.pulumi.set_all_config(config, cwd=stack_dir)
 
             if preview_only:
                 # Preview only
-                result = self.pulumi.preview(cwd=stack_dir)
+                result = self.pulumi.preview(cwd=stack_dir, config_file=config_file)
                 return result.get("success", False), result.get("error")
             else:
                 # Deploy
-                result = self.pulumi.up(cwd=stack_dir, yes=True)
+                result = self.pulumi.up(cwd=stack_dir, yes=True, config_file=config_file)
                 return result.get("success", False), None
 
         except PulumiError as e:
@@ -81,7 +84,7 @@ class StackOperations:
         Destroy a stack
 
         Args:
-            deployment_id: Deployment ID
+            deployment_id: Deployment ID (included in composite project name)
             stack_name: Stack name
             environment: Environment
             stack_dir: Path to stack directory
@@ -89,7 +92,7 @@ class StackOperations:
         Returns:
             Tuple of (success, error_message)
         """
-        pulumi_stack_name = f"{deployment_id}-{stack_name}-{environment}"
+        pulumi_stack_name = f"{stack_name}-{environment}"
 
         try:
             # Select stack
@@ -114,7 +117,7 @@ class StackOperations:
         Refresh stack state
 
         Args:
-            deployment_id: Deployment ID
+            deployment_id: Deployment ID (included in composite project name)
             stack_name: Stack name
             environment: Environment
             stack_dir: Path to stack directory
@@ -122,7 +125,7 @@ class StackOperations:
         Returns:
             Tuple of (success, error_message)
         """
-        pulumi_stack_name = f"{deployment_id}-{stack_name}-{environment}"
+        pulumi_stack_name = f"{stack_name}-{environment}"
 
         try:
             self.pulumi.select_stack(pulumi_stack_name, create=False, cwd=stack_dir)

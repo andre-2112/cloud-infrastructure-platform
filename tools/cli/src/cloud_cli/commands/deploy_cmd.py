@@ -178,8 +178,14 @@ async def _execute_deployment(
     # Initialize Pulumi
     # Use pulumiOrg (Pulumi Cloud organization), NOT organization (deployment org)
     pulumi_org = manifest.get("pulumiOrg", manifest.get("organization", ""))
-    project = manifest.get("project", deployment_id)
-    pulumi_wrapper = PulumiWrapper(organization=pulumi_org, project=project)
+
+    # Build composite project name: DeploymentID-Organization-Project
+    deployment_id_str = manifest.get("deployment_id", deployment_id)
+    organization = manifest.get("organization", "")
+    project = manifest.get("project", "")
+    composite_project = f"{deployment_id_str}-{organization}-{project}"
+
+    pulumi_wrapper = PulumiWrapper(organization=pulumi_org, project=composite_project)
     stack_ops = StackOperations(pulumi_wrapper)
 
     # Config generator
@@ -204,7 +210,7 @@ async def _execute_deployment(
             pulumi_config = config_gen.generate_pulumi_config_values(stack_name, environment)
 
             # Use deployment context for Pulumi.yaml management
-            with pulumi_wrapper.deployment_context(stack_dir, stack_name):
+            with pulumi_wrapper.deployment_context(stack_dir, manifest, deployment_dir):
                 # Deploy stack within context
                 success, error = stack_ops.deploy_stack(
                     deployment_id=deployment_id,
@@ -213,6 +219,7 @@ async def _execute_deployment(
                     stack_dir=stack_dir,
                     config=pulumi_config,
                     preview_only=False,
+                    config_file=config_file,
                 )
             # Pulumi.yaml automatically restored here
 

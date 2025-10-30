@@ -95,39 +95,45 @@ class ConfigGenerator:
         # Write config file in Pulumi format
         config_file = self.config_dir / f"{stack_name}.{environment}.yaml"
 
+        # Build composite project name: DeploymentID-Organization-Project
+        deployment_id = manifest.get("deployment_id", "")
+        organization = manifest.get("organization", "")
+        project = manifest.get("project", "")
+        composite_project = f"{deployment_id}-{organization}-{project}"
+
         with open(config_file, "w", encoding="utf-8") as f:
             # Write deployment metadata
-            f.write(f'{stack_name}:deploymentId: "{manifest.get("deployment_id", "")}"\n')
-            f.write(f'{stack_name}:organization: "{manifest.get("organization", "")}"\n')
-            f.write(f'{stack_name}:project: "{manifest.get("project", "")}"\n')
-            f.write(f'{stack_name}:domain: "{manifest.get("domain", "")}"\n')
+            f.write(f'{composite_project}:deploymentId: "{deployment_id}"\n')
+            f.write(f'{composite_project}:organization: "{organization}"\n')
+            f.write(f'{composite_project}:project: "{project}"\n')
+            f.write(f'{composite_project}:domain: "{manifest.get("domain", "")}"\n')
 
             # Write environment config
-            f.write(f'{stack_name}:environment: "{environment}"\n')
-            f.write(f'{stack_name}:region: "{env_config.get("region", "")}"\n')
-            f.write(f'{stack_name}:accountId: "{env_config.get("account_id", "")}"\n')
+            f.write(f'{composite_project}:environment: "{environment}"\n')
+            f.write(f'{composite_project}:region: "{env_config.get("region", "")}"\n')
+            f.write(f'{composite_project}:accountId: "{env_config.get("account_id", "")}"\n')
 
             # Write stack metadata
-            f.write(f'{stack_name}:stackName: "{stack_name}"\n')
-            f.write(f'{stack_name}:layer: "{stack_config.get("layer", 1)}"\n')
+            f.write(f'{composite_project}:stackName: "{stack_name}"\n')
+            f.write(f'{composite_project}:layer: "{stack_config.get("layer", 1)}"\n')
 
             # Write dependencies as JSON array string
             deps = stack_config.get("dependencies", [])
             if deps:
                 import json
-                f.write(f'{stack_name}:dependencies: \'{json.dumps(deps)}\'\n')
+                f.write(f'{composite_project}:dependencies: \'{json.dumps(deps)}\'\n')
 
             # Write stack-specific configuration
             stack_specific_config = stack_config.get("config", {})
             for key, value in stack_specific_config.items():
                 # Format value appropriately
                 if isinstance(value, str):
-                    f.write(f'{stack_name}:{key}: "{value}"\n')
+                    f.write(f'{composite_project}:{key}: "{value}"\n')
                 elif isinstance(value, (list, dict)):
                     import json
-                    f.write(f'{stack_name}:{key}: \'{json.dumps(value)}\'\n')
+                    f.write(f'{composite_project}:{key}: \'{json.dumps(value)}\'\n')
                 else:
-                    f.write(f'{stack_name}:{key}: "{value}"\n')
+                    f.write(f'{composite_project}:{key}: "{value}"\n')
 
             # Write AWS region for Pulumi AWS provider
             f.write(f'aws:region: "{env_config.get("region", "us-east-1")}"\n')
@@ -258,28 +264,28 @@ class ConfigGenerator:
             import json
 
             # Write in Pulumi format
-            f.write(f'{stack_name}:deploymentId: "{config.get("deployment_id", "")}"\n')
-            f.write(f'{stack_name}:organization: "{config.get("organization", "")}"\n')
-            f.write(f'{stack_name}:project: "{config.get("project", "")}"\n')
-            f.write(f'{stack_name}:domain: "{config.get("domain", "")}"\n')
-            f.write(f'{stack_name}:environment: "{config.get("environment", "")}"\n')
-            f.write(f'{stack_name}:region: "{config.get("region", "")}"\n')
-            f.write(f'{stack_name}:accountId: "{config.get("account_id", "")}"\n')
-            f.write(f'{stack_name}:stackName: "{stack_name}"\n')
-            f.write(f'{stack_name}:layer: "{config.get("layer", 1)}"\n')
+            f.write(f'{composite_project}:deploymentId: "{config.get("deployment_id", "")}"\n')
+            f.write(f'{composite_project}:organization: "{config.get("organization", "")}"\n')
+            f.write(f'{composite_project}:project: "{config.get("project", "")}"\n')
+            f.write(f'{composite_project}:domain: "{config.get("domain", "")}"\n')
+            f.write(f'{composite_project}:environment: "{config.get("environment", "")}"\n')
+            f.write(f'{composite_project}:region: "{config.get("region", "")}"\n')
+            f.write(f'{composite_project}:accountId: "{config.get("account_id", "")}"\n')
+            f.write(f'{composite_project}:stackName: "{stack_name}"\n')
+            f.write(f'{composite_project}:layer: "{config.get("layer", 1)}"\n')
 
             deps = config.get("dependencies", [])
             if deps:
-                f.write(f'{stack_name}:dependencies: \'{json.dumps(deps)}\'\n')
+                f.write(f'{composite_project}:dependencies: \'{json.dumps(deps)}\'\n')
 
             stack_specific_config = config.get("config", {})
             for key, value in stack_specific_config.items():
                 if isinstance(value, str):
-                    f.write(f'{stack_name}:{key}: "{value}"\n')
+                    f.write(f'{composite_project}:{key}: "{value}"\n')
                 elif isinstance(value, (list, dict)):
-                    f.write(f'{stack_name}:{key}: \'{json.dumps(value)}\'\n')
+                    f.write(f'{composite_project}:{key}: \'{json.dumps(value)}\'\n')
                 else:
-                    f.write(f'{stack_name}:{key}: "{value}"\n')
+                    f.write(f'{composite_project}:{key}: "{value}"\n')
 
             f.write(f'aws:region: "{config.get("region", "us-east-1")}"\n')
 

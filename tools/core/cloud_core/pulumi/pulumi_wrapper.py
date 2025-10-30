@@ -182,12 +182,13 @@ class PulumiWrapper:
         for key, value in config.items():
             self.set_config(key, value, cwd=cwd)
 
-    def preview(self, cwd: Optional[Path] = None) -> Dict[str, Any]:
+    def preview(self, cwd: Optional[Path] = None, config_file: Optional[Path] = None) -> Dict[str, Any]:
         """
         Run pulumi preview
 
         Args:
             cwd: Working directory
+            config_file: Path to config file (relative to cwd or absolute)
 
         Returns:
             Preview result summary
@@ -198,21 +199,22 @@ class PulumiWrapper:
         logger.info("Running Pulumi preview")
 
         try:
-            result = self._run_command(
-                ["pulumi", "preview", "--json", "--non-interactive"],
-                cwd=cwd,
-            )
+            cmd = ["pulumi", "preview", "--json", "--non-interactive"]
+            if config_file:
+                cmd.extend(["--config-file", str(config_file)])
 
-            # Parse JSON output (simplified)
-            # Real implementation would parse the JSON streaming output
-            return {"success": True, "output": result.stdout}
+                result = self._run_command(cmd, cwd=cwd)
+
+                # Parse JSON output (simplified)
+                # Real implementation would parse the JSON streaming output
+                return {"success": True, "output": result.stdout}
 
         except PulumiError as e:
             logger.error(f"Preview failed: {e}")
             return {"success": False, "error": str(e)}
 
     def up(
-        self, cwd: Optional[Path] = None, yes: bool = True
+        self, cwd: Optional[Path] = None, yes: bool = True, config_file: Optional[Path] = None
     ) -> Dict[str, Any]:
         """
         Deploy stack (pulumi up)
@@ -220,6 +222,7 @@ class PulumiWrapper:
         Args:
             cwd: Working directory
             yes: Auto-approve changes
+            config_file: Path to config file (relative to cwd or absolute)
 
         Returns:
             Deployment result summary
@@ -232,6 +235,8 @@ class PulumiWrapper:
         cmd = ["pulumi", "up", "--non-interactive"]
         if yes:
             cmd.append("--yes")
+        if config_file:
+            cmd.extend(["--config-file", str(config_file)])
 
         try:
             result = self._run_command(cmd, cwd=cwd, capture_output=False)
@@ -436,14 +441,23 @@ class PulumiWrapper:
                     logger.error(f"Cannot restore Pulumi.yaml after 3 attempts: {e}")
                     # Don't raise - we're in cleanup, best effort
 
-    def _generate_pulumi_yaml(self, stack_dir: Path, stack_name: str) -> None:
+    def _generate_pulumi_yaml(self, stack_dir: Path, manifest: Dict[str, Any], deployment_dir: Optional[Path] = None) -> None:
         """
-        Generate deployment-specific Pulumi.yaml
+        Generate deployment-specific Pulumi.yaml with composite project naming
 
         Args:
-            stack_dir: Stack directory
-            stack_name: Base stack name (e.g., "network")
+            stack_dir: Stack directory path
+            manifest: Deployment manifest with organization, project, deployment_id
+            deployment_dir: Optional deployment directory to store authoritative copy
         """
+        # Build composite project name: DeploymentID-Organization-Project
+        deployment_id = manifest.get("deployment_id", "")
+        organization = manifest.get("organization", "")
+        project = manifest.get("project", "")
+        composite_project = f"{deployment_id}-{organization}-{project}"
+
+        logger.info(f"Generating Pulumi.yaml with composite project: {composite_project}")
+
         pulumi_yaml = stack_dir / "Pulumi.yaml"
 
         # Read original to preserve runtime and description
@@ -457,21 +471,21 @@ class PulumiWrapper:
 
         # Generate new content with deployment project name
         new_content = {
-            'name': self.project,  # Use deployment project name
+            'name': composite_project,  # Use composite project name
             'runtime': original_content.get('runtime', 'nodejs'),
-            'description': original_content.get('description', f'{stack_name} stack'),
+            'description': original_content.get('description', f'Deployment {composite_project} stack'),
         }
 
         # Write deployment-specific Pulumi.yaml
         try:
             with open(pulumi_yaml, 'w') as f:
                 yaml.safe_dump(new_content, f, default_flow_style=False)
-            logger.info(f"Generated Pulumi.yaml with project: {self.project}")
+            logger.info(f"Generated Pulumi.yaml with composite project: {composite_project}")
         except Exception as e:
             raise PulumiError(f"Cannot generate Pulumi.yaml: {e}")
 
     @contextmanager
-    def deployment_context(self, stack_dir: Path, stack_name: str):
+    def deployment_context(self, stack_dir: Path, manifest: Dict[str, Any], deployment_dir: Optional[Path] = None):
         """
         Context manager for deployment-specific Pulumi.yaml
 
@@ -479,14 +493,15 @@ class PulumiWrapper:
         by temporarily replacing Pulumi.yaml in the stack directory.
 
         Usage:
-            with pulumi_wrapper.deployment_context(stack_dir, "network"):
+            with pulumi_wrapper.deployment_context(stack_dir, manifest, deployment_dir):
                 # Pulumi operations here
                 pulumi_wrapper.select_stack(...)
                 pulumi_wrapper.up(...)
 
         Args:
             stack_dir: Stack directory path
-            stack_name: Base stack name
+            manifest: Deployment manifest with organization, project, deployment_id
+            deployment_dir: Optional deployment directory to store authoritative copy
 
         Yields:
             None - Context for operations
@@ -495,7 +510,8 @@ class PulumiWrapper:
         try:
             # Backup and generate
             backup_path = self._backup_pulumi_yaml(stack_dir)
-            self._generate_pulumi_yaml(stack_dir, stack_name)
+            self._generate_pulumi_yaml(stack_dir, manifest, deployment_dir)
+            logger.debug("Generated deployment-specific Pulumi.yaml")
 
             yield
 

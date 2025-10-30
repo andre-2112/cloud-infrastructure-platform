@@ -471,7 +471,9 @@ sync local state with remote pulumi - for new cli users
 multiple pulumi yaml inside the stacks???
 Option 3: create pulumi.yaml in the deployment dir and cp to stack dir during deployment.
 
+search for same path issues in all commands. fix them.
 
+config_generator is used fbyor stack configuration or deployment configuration?
 
 ==
 1 - add architecture and implementation support, for aws tags for organization, project, deployment id, stack and environment; for every and all aws resources created. identify all of the aws resources cannot be tagged.

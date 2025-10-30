@@ -1,8 +1,8 @@
 # Installation and Build Guide
 
 **Platform:** cloud-0.7
-**Architecture:** 4.5
-**Last Updated:** 2025-10-30
+**Architecture:** 4.6
+**Last Updated:** 2025-01-30
 
 ---
 
@@ -410,7 +410,7 @@ python -m cloud_cli.main --version
 # Expected output:
 # Cloud Infrastructure Orchestration Platform CLI
 # Version: 0.7.0
-# Architecture: 4.5
+# Architecture: 4.6
 # Python: 3.13.x
 ```
 
@@ -900,16 +900,16 @@ See [INSTALL_v4.1_additions.md](INSTALL_v4.1_additions.md) for complete auto-ext
 ---
 
 **For additional documentation, see:**
-- [Multi_Stack_Architecture.4.1.md](Multi_Stack_Architecture.4.1.md) - Complete architecture
-- [Complete_Stack_Management_Guide_v4.md](Complete_Stack_Management_Guide_v4.md) - Complete workflow guide
-- [Stack_Parameters_and_Registration_Guide_v4.md](Stack_Parameters_and_Registration_Guide_v4.md) - Template system
+- [Multi_Stack_Architecture.4.6.md](Multi_Stack_Architecture.4.6.md) - Complete architecture
+- [Complete_Stack_Management_Guide_v4.6.md](Complete_Stack_Management_Guide_v4.6.md) - Complete workflow guide
+- [Stack_Parameters_and_Registration_Guide_v4.6.md](Stack_Parameters_and_Registration_Guide_v4.6.md) - Template system
 - [CLI_Commands_Reference.3.1.md](CLI_Commands_Reference.3.1.md) - All CLI commands
-- [Directory_Structure_Diagram.4.1.md](Directory_Structure_Diagram.4.1.md) - Directory layout
+- [Directory_Structure_Diagram.4.6.md](Directory_Structure_Diagram.4.6.md) - Directory layout
 - [README.md](README.md) - Documentation index
 
 ---
 
-**Document Version:** 4.5
-**Last Updated:** 2025-10-30
+**Document Version:** 4.6
+**Last Updated:** 2025-01-30
 **Platform:** cloud-0.7
-**Architecture:** 4.5
+**Architecture:** 4.6

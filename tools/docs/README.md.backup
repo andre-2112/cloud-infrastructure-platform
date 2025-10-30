@@ -1,14 +1,14 @@
 # Cloud Infrastructure Orchestration Platform - Documentation Index
 
 **Platform:** cloud-0.7
-**Architecture Version:** 4.6
-**Last Updated:** 2025-01-30
+**Architecture Version:** 4.5
+**Last Updated:** 2025-10-30
 
 ---
 
 ## Welcome
 
-This is the master documentation index for the Cloud Infrastructure Orchestration Platform (cloud-0.7). This platform provides comprehensive tools for managing complex, interdependent AWS infrastructure deployments using Pulumi with a Python-based CLI, core business logic library, and dynamic Pulumi.yaml management (NEW in v4.6).
+This is the master documentation index for the Cloud Infrastructure Orchestration Platform (cloud-0.7). This platform provides comprehensive tools for managing complex, interdependent AWS infrastructure deployments using Pulumi with a Python-based CLI, core business logic library, and dynamic Pulumi.yaml management (NEW in v4.5).
 
 ---
 
@@ -17,8 +17,8 @@ This is the master documentation index for the Cloud Infrastructure Orchestratio
 | Document | Description |
 |----------|-------------|
 | [INSTALL.md](INSTALL.md) | **Start here!** Complete installation and build guide for stacks and CLI |
-| [Multi_Stack_Architecture.4.6.md](Multi_Stack_Architecture.4.6.md) | Main architecture document - comprehensive platform overview (v4.6) |
-| [Directory_Structure_Diagram.4.6.md](Directory_Structure_Diagram.4.6.md) | Complete directory structure and organization (v4.6) |
+| [Multi_Stack_Architecture.4.5.md](Multi_Stack_Architecture.4.5.md) | Main architecture document - comprehensive platform overview (v4.5) |
+| [Directory_Structure_Diagram.4.5.md](Directory_Structure_Diagram.4.5.md) | Complete directory structure and organization (v4.5) |
 
 ---
 
@@ -30,21 +30,21 @@ These documents define the current, authoritative architecture:
 
 | Document | Version | Description |
 |----------|---------|-------------|
-| [Complete_Stack_Management_Guide_v4.6.md](Complete_Stack_Management_Guide_v4.6.md) | 4.0 | 🔖 **Authoritative** - Complete platform workflow and management |
-| [Stack_Parameters_and_Registration_Guide_v4.6.md](Stack_Parameters_and_Registration_Guide_v4.6.md) | 4.0 | 🔖 **Authoritative** - Enhanced templates, parameters, and registration |
-| [Complete_Guide_Templates_Stacks_Config_and_Registration_v4.6.md](Complete_Guide_Templates_Stacks_Config_and_Registration_v4.6.md) | 4.0 | 🔖 **Authoritative** - Template system and configuration flow |
+| [Complete_Stack_Management_Guide_v4.md](Complete_Stack_Management_Guide_v4.md) | 4.0 | 🔖 **Authoritative** - Complete platform workflow and management |
+| [Stack_Parameters_and_Registration_Guide_v4.md](Stack_Parameters_and_Registration_Guide_v4.md) | 4.0 | 🔖 **Authoritative** - Enhanced templates, parameters, and registration |
+| [Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md](Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md) | 4.0 | 🔖 **Authoritative** - Template system and configuration flow |
 | [Implementation_Compliance_Report_v4.md](Implementation_Compliance_Report_v4.md) | 4.0 | Architecture compliance verification report |
 
-### Core Architecture Documents (v4.6)
+### Core Architecture Documents (v4.5)
 
-Updated to align with v4.0 authoritative documents, enhanced in v4.6:
+Updated to align with v4.0 authoritative documents, enhanced in v4.5:
 
 | Document | Version | Description |
 |----------|---------|-------------|
-| [Multi_Stack_Architecture.4.6.md](Multi_Stack_Architecture.4.6.md) | 4.5 | Complete architecture specification with dynamic Pulumi.yaml |
-| [Directory_Structure_Diagram.4.6.md](Directory_Structure_Diagram.4.6.md) | 4.5 | Directory structure reference |
-| [Deployment_Manifest_Specification.4.6.md](Deployment_Manifest_Specification.4.6.md) | 4.5 | Manifest file format with pulumiOrg/project fields |
-| [Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md](Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md) | 4.1 | **NEW v4.6:** Dynamic Pulumi.yaml management system |
+| [Multi_Stack_Architecture.4.5.md](Multi_Stack_Architecture.4.5.md) | 4.5 | Complete architecture specification with dynamic Pulumi.yaml |
+| [Directory_Structure_Diagram.4.5.md](Directory_Structure_Diagram.4.5.md) | 4.5 | Directory structure reference |
+| [Deployment_Manifest_Specification.4.5.md](Deployment_Manifest_Specification.4.5.md) | 4.5 | Manifest file format with pulumiOrg/project fields |
+| [Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md](Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md) | 4.1 | **NEW v4.5:** Dynamic Pulumi.yaml management system |
 
 ---
 
@@ -108,16 +108,16 @@ Updated to align with v4.0 authoritative documents, enhanced in v4.6:
 ## Quick Navigation by Topic
 
 ### 🏗️ Architecture & Design
-- [Multi_Stack_Architecture.4.6.md](Multi_Stack_Architecture.4.6.md) - **Current architecture (v4.6)**
-- [Complete_Stack_Management_Guide_v4.6.md](Complete_Stack_Management_Guide_v4.6.md) - **Authoritative guide**
-- [Directory_Structure_Diagram.4.6.md](Directory_Structure_Diagram.4.6.md) - **Directory layout (v4.6)**
-- [Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md](Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md) - **Dynamic Pulumi.yaml (NEW v4.6)**
+- [Multi_Stack_Architecture.4.5.md](Multi_Stack_Architecture.4.5.md) - **Current architecture (v4.5)**
+- [Complete_Stack_Management_Guide_v4.md](Complete_Stack_Management_Guide_v4.md) - **Authoritative guide**
+- [Directory_Structure_Diagram.4.5.md](Directory_Structure_Diagram.4.5.md) - **Directory layout (v4.5)**
+- [Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md](Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md) - **Dynamic Pulumi.yaml (NEW v4.5)**
 - [Architecture_Inconsistency_Analysis_v3.1_to_v4.md](Architecture_Inconsistency_Analysis_v3.1_to_v4.md) - **v3.1 to v4.0 changes**
 
 ### 📦 Templates & Configuration
-- [Complete_Guide_Templates_Stacks_Config_and_Registration_v4.6.md](Complete_Guide_Templates_Stacks_Config_and_Registration_v4.6.md) - **Authoritative template guide**
-- [Stack_Parameters_and_Registration_Guide_v4.6.md](Stack_Parameters_and_Registration_Guide_v4.6.md) - **Enhanced templates**
-- [Deployment_Manifest_Specification.4.6.md](Deployment_Manifest_Specification.4.6.md) - **Manifest format (v4.6)**
+- [Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md](Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md) - **Authoritative template guide**
+- [Stack_Parameters_and_Registration_Guide_v4.md](Stack_Parameters_and_Registration_Guide_v4.md) - **Enhanced templates**
+- [Deployment_Manifest_Specification.4.5.md](Deployment_Manifest_Specification.4.5.md) - **Manifest format (v4.5)**
 
 ### 💻 CLI Usage
 - [INSTALL.md](INSTALL.md) - Installation guide
@@ -163,9 +163,9 @@ cloud/
     │   ├── Directory_Structure_Diagram.4.1.md           # v4.1 Directory structure
     │   ├── Deployment_Manifest_Specification.4.1.md     # v4.1 Manifest spec
     │   │
-    │   ├── Complete_Stack_Management_Guide_v4.6.md        # 🔖 Authoritative v4
-    │   ├── Stack_Parameters_and_Registration_Guide_v4.6.md  # 🔖 Authoritative v4
-    │   ├── Complete_Guide_Templates_Stacks_Config_and_Registration_v4.6.md  # 🔖 Authoritative v4
+    │   ├── Complete_Stack_Management_Guide_v4.md        # 🔖 Authoritative v4
+    │   ├── Stack_Parameters_and_Registration_Guide_v4.md  # 🔖 Authoritative v4
+    │   ├── Complete_Guide_Templates_Stacks_Config_and_Registration_v4.md  # 🔖 Authoritative v4
     │   ├── Implementation_Compliance_Report_v4.md
     │   ├── Architecture_Inconsistency_Analysis_v3.1_to_v4.md
     │   │
@@ -222,7 +222,7 @@ cloud/
 
 ---
 
-## Architecture Highlights (v4.6)
+## Architecture Highlights (v4.5)
 
 ### Core/CLI Architecture
 
@@ -300,14 +300,14 @@ database-rds:
 See [INSTALL.md](INSTALL.md) troubleshooting section
 
 ### Architecture Questions
-- See [Complete_Stack_Management_Guide_v4.6.md](Complete_Stack_Management_Guide_v4.6.md) for complete workflow
+- See [Complete_Stack_Management_Guide_v4.md](Complete_Stack_Management_Guide_v4.md) for complete workflow
 - See [Architecture_Inconsistency_Analysis_v3.1_to_v4.md](Architecture_Inconsistency_Analysis_v3.1_to_v4.md) for v3.1 to v4.0 migration
 
 ### Command Usage
 See [CLI_Commands_Reference.3.1.md](CLI_Commands_Reference.3.1.md)
 
 ### Template System
-See [Stack_Parameters_and_Registration_Guide_v4.6.md](Stack_Parameters_and_Registration_Guide_v4.6.md)
+See [Stack_Parameters_and_Registration_Guide_v4.md](Stack_Parameters_and_Registration_Guide_v4.md)
 
 ### API Usage
 See [REST_API_Documentation.3.1.md](REST_API_Documentation.3.1.md)
@@ -346,8 +346,8 @@ For questions or support, refer to the platform maintainers or open an issue on 
 
 **Platform:** cloud-0.7
 **Architecture:** 4.5
-**Total Documentation:** 21+ files (v4.6) + 16 files (legacy v3.1)
-**Last Updated:** 2025-01-30
-**Implementation Status:** ✅ 100% Architecture Compliant (v4.6)
+**Total Documentation:** 21+ files (v4.5) + 16 files (legacy v3.1)
+**Last Updated:** 2025-10-30
+**Implementation Status:** ✅ 100% Architecture Compliant (v4.5)
 
 **End of Documentation Index**
