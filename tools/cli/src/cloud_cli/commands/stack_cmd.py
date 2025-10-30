@@ -22,6 +22,11 @@ from cloud_cli.parser import ParameterExtractor
 app = typer.Typer()
 console = Console()
 logger = get_logger(__name__)
+# Calculate cloud root from this file's location
+# __file__ = cloud/tools/cli/src/cloud_cli/commands/stack_cmd.py
+# Go up 6 levels to reach cloud/
+CLOUD_ROOT = Path(__file__).parent.parent.parent.parent.parent.parent
+STACKS_ROOT = CLOUD_ROOT / "stacks"
 
 
 @app.command(name="register-stack")
@@ -49,7 +54,7 @@ def register_stack_command(
 
     try:
         # Validate stack directory exists
-        stack_dir = Path.cwd() / "stacks" / stack_name
+        stack_dir = STACKS_ROOT / stack_name
         if not stack_dir.exists():
             console.print(f"[red]Error:[/red] Stack directory not found: {stack_dir}")
             raise typer.Exit(1)
@@ -176,7 +181,7 @@ def list_stacks_command() -> None:
     """List all registered stacks"""
 
     try:
-        template_dir = Path.cwd() / "tools" / "templates" / "config"
+        template_dir = CLOUD_ROOT / "tools" / "templates" / "config"
 
         if not template_dir.exists():
             console.print("[yellow]No stacks registered[/yellow]")
@@ -226,7 +231,7 @@ def update_stack_command(
     """Update a registered stack's configuration"""
 
     try:
-        template_file = Path.cwd() / "tools" / "templates" / "config" / f"{stack_name}.yaml"
+        template_file = CLOUD_ROOT / "tools" / "templates" / "config" / f"{stack_name}.yaml"
 
         if not template_file.exists():
             console.print(f"[red]Error:[/red] Stack '{stack_name}' not registered")
@@ -265,7 +270,7 @@ def unregister_stack_command(
     """Unregister a stack from the platform"""
 
     try:
-        template_file = Path.cwd() / "tools" / "templates" / "config" / f"{stack_name}.yaml"
+        template_file = CLOUD_ROOT / "tools" / "templates" / "config" / f"{stack_name}.yaml"
 
         if not template_file.exists():
             console.print(f"[red]Error:[/red] Stack '{stack_name}' not registered")
@@ -302,7 +307,7 @@ def validate_stack_command(
 
     try:
         # Check stack directory
-        stack_dir = Path.cwd() / "stacks" / stack_name
+        stack_dir = STACKS_ROOT / stack_name
 
         if not stack_dir.exists():
             console.print(f"[red]Error:[/red] Stack directory not found: {stack_dir}")

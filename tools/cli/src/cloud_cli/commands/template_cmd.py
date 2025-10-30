@@ -19,6 +19,8 @@ from cloud_core.utils.logger import get_logger
 app = typer.Typer()
 console = Console()
 logger = get_logger(__name__)
+# Calculate cloud root from this file's location
+CLOUD_ROOT = Path(__file__).parent.parent.parent.parent.parent.parent
 
 
 @app.command(name="list-templates")
@@ -93,7 +95,7 @@ def create_template_command(
     """Create a new deployment template"""
 
     try:
-        template_dir = Path.cwd() / "tools" / "templates" / "default"
+        template_dir = CLOUD_ROOT / "tools" / "templates" / "default"
         template_file = template_dir / f"{template_name}.yaml"
 
         if template_file.exists():
@@ -161,7 +163,7 @@ def update_template_command(
     """Update an existing template"""
 
     try:
-        template_dir = Path.cwd() / "tools" / "templates" / "default"
+        template_dir = CLOUD_ROOT / "tools" / "templates" / "default"
         template_file = template_dir / f"{template_name}.yaml"
 
         if not template_file.exists():

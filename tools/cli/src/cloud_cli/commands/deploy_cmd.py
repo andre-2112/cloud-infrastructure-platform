@@ -93,8 +93,8 @@ def deploy_command(
         # Validate stack code against templates
         if validate_code:
             console.print("\nValidating stack code against templates...")
-            cli_root = Path(__file__).parent.parent.parent.parent.parent
-            stacks_root = cli_root / "stacks"
+            cloud_root = Path(__file__).parent.parent.parent.parent.parent.parent  # Go to cloud root
+            stacks_root = cloud_root / "stacks"
 
             code_validator = StackCodeValidator()
             all_valid, validation_results = code_validator.validate_deployment(
@@ -172,8 +172,8 @@ async def _execute_deployment(
     """Execute deployment asynchronously"""
 
     # Get stack dir (assuming stacks are in cloud/stacks/)
-    cli_root = Path(__file__).parent.parent.parent.parent.parent
-    stacks_root = cli_root / "stacks"
+    cloud_root = Path(__file__).parent.parent.parent.parent.parent.parent  # Go to cloud root
+    stacks_root = cloud_root / "stacks"
 
     # Initialize Pulumi
     # Use pulumiOrg (Pulumi Cloud organization), NOT organization (deployment org)
