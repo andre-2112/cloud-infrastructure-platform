@@ -31,7 +31,7 @@ def validate_callback(
     pass
 
 
-@app.command()
+@app.command(name="deployment")
 def validate(
     deployment_id: str = typer.Argument(..., help="Deployment ID"),
 ) -> None:
@@ -116,7 +116,7 @@ def validate(
         raise typer.Exit(1)
 
 
-@app.command(name="validate-dependencies")
+@app.command(name="dependencies")
 def validate_dependencies_command(
     deployment_id: str = typer.Argument(..., help="Deployment ID"),
 ) -> None:
@@ -157,7 +157,7 @@ def validate_dependencies_command(
         raise typer.Exit(1)
 
 
-@app.command(name="validate-aws")
+@app.command(name="aws-access")
 def validate_aws_command() -> None:
     """Validate AWS credentials and basic permissions"""
 
@@ -184,7 +184,7 @@ def validate_aws_command() -> None:
         raise typer.Exit(1)
 
 
-@app.command(name="validate-pulumi")
+@app.command(name="pulumi-access")
 def validate_pulumi_command() -> None:
     """Validate Pulumi CLI and access token"""
 
