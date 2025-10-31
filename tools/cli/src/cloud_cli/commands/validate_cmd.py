@@ -145,8 +145,6 @@ def validate_dependencies_command(
 
         if dep_validator.validate(manifest_validator.manifest):
             safe_print(console, "[green]✓ No dependency cycles found[/green]")
-            console.print(f"Total stacks: {dep_validator.total_stacks}")
-            console.print(f"Dependency edges: {dep_validator.total_edges}")
         else:
             safe_print(console, "[red]✗ Dependency validation failed:[/red]")
             for error in dep_validator.errors:
