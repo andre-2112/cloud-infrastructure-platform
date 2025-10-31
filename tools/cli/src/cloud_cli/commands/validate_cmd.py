@@ -18,13 +18,21 @@ from cloud_core.validation import (
 )
 from cloud_core.utils.logger import get_logger
 
-app = typer.Typer()
+app = typer.Typer(invoke_without_command=True, no_args_is_help=True)
 console = Console()
 logger = get_logger(__name__)
 
 
+@app.callback()
+def validate_callback(
+    ctx: typer.Context,
+) -> None:
+    """Validation commands for deployments, dependencies, AWS, and Pulumi"""
+    pass
+
+
 @app.command()
-def validate_command(
+def validate(
     deployment_id: str = typer.Argument(..., help="Deployment ID"),
 ) -> None:
     """Run full deployment validation"""

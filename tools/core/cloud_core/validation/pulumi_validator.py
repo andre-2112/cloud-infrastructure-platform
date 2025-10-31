@@ -65,7 +65,25 @@ class PulumiValidator:
 
     def _check_access_token(self) -> bool:
         """Check if Pulumi access token is configured"""
-        # Check PULUMI_ACCESS_TOKEN environment variable
+        # First check if logged in via pulumi whoami
+        try:
+            result = subprocess.run(
+                ["pulumi", "whoami"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+
+            username = result.stdout.strip()
+            if username:
+                logger.info(f"Pulumi logged in as: {username}")
+                return True
+
+        except subprocess.CalledProcessError:
+            # Not logged in, check for environment variable as fallback
+            pass
+
+        # Fallback: Check PULUMI_ACCESS_TOKEN environment variable
         access_token = os.getenv("PULUMI_ACCESS_TOKEN")
 
         if not access_token:

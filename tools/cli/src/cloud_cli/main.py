@@ -115,10 +115,7 @@ app.add_typer(template_cmd.app, name="update-template", help="Update a template"
 app.add_typer(template_cmd.app, name="validate-template", help="Validate a template")
 
 # Validation
-app.add_typer(validate_cmd.app, name="validate", help="Run full validation")
-app.add_typer(validate_cmd.app, name="validate-dependencies", help="Validate dependencies")
-app.add_typer(validate_cmd.app, name="validate-aws", help="Validate AWS credentials")
-app.add_typer(validate_cmd.app, name="validate-pulumi", help="Validate Pulumi setup")
+app.add_typer(validate_cmd.app, name="validate", help="Validation commands")
 
 
 # Entry point

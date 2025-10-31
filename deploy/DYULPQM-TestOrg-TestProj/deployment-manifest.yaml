@@ -1,0 +1,156 @@
+version: '4.1'
+deployment_id: DYULPQM
+organization: TestOrg
+project: TestProj
+domain: genesis3d.com
+template: default
+created_at: '2025-10-30T22:32:13.714946Z'
+metadata:
+  generated_from_template: default
+  generator_version: 0.7.0
+  author: Cloud Platform
+  created: '2025-10-23'
+  architecture_version: '4.1'
+environments:
+  dev:
+    enabled: true
+    region: us-east-1
+    account_id: '211050572089'
+  stage:
+    enabled: false
+    region: us-east-1
+    account_id: '211050572089'
+  prod:
+    enabled: false
+    region: us-east-1
+    account_id: '211050572089'
+stacks:
+  network:
+    enabled: true
+    layer: 1
+    dependencies: []
+    config:
+      vpc_cidr: 10.0.0.0/16
+      availability_zones: 3
+  security:
+    enabled: false
+    layer: 2
+    dependencies:
+    - network
+    config:
+      create_default_sg: true
+  dns:
+    enabled: false
+    layer: 2
+    dependencies:
+    - network
+    config:
+      hosted_zone_type: public
+  secrets:
+    enabled: false
+    layer: 2
+    dependencies: []
+    config:
+      rotation_enabled: false
+  authentication:
+    enabled: false
+    layer: 3
+    dependencies:
+    - security
+    config:
+      user_pool_name: '{{deployment_id}}-users'
+  storage:
+    enabled: false
+    layer: 3
+    dependencies:
+    - security
+    config:
+      versioning_enabled: true
+      encryption_enabled: true
+  database-rds:
+    enabled: false
+    layer: 4
+    dependencies:
+    - network
+    - security
+    config:
+      engine: postgres
+      instance_class: db.t3.micro
+      allocated_storage: 20
+  containers-images:
+    enabled: false
+    layer: 4
+    dependencies:
+    - authentication
+    config:
+      scan_on_push: true
+  containers-apps:
+    enabled: false
+    layer: 5
+    dependencies:
+    - network
+    - security
+    - storage
+    - containers-images
+    config:
+      cpu: 256
+      memory: 512
+  services-ecr:
+    enabled: false
+    layer: 4
+    dependencies: []
+    config:
+      image_tag_mutability: MUTABLE
+  services-ecs:
+    enabled: false
+    layer: 5
+    dependencies:
+    - network
+    - security
+    - services-ecr
+    config:
+      cluster_name: '{{deployment_id}}-cluster'
+  services-eks:
+    enabled: false
+    layer: 5
+    dependencies:
+    - network
+    - security
+    config:
+      kubernetes_version: '1.27'
+      node_instance_type: t3.medium
+  services-api:
+    enabled: false
+    layer: 6
+    dependencies:
+    - network
+    - security
+    - database-rds
+    config:
+      api_type: REST
+  compute-ec2:
+    enabled: false
+    layer: 4
+    dependencies:
+    - network
+    - security
+    config:
+      instance_type: t3.micro
+      ami: amazon-linux-2
+  compute-lambda:
+    enabled: false
+    layer: 5
+    dependencies:
+    - network
+    - security
+    config:
+      runtime: python3.11
+      timeout: 300
+  monitoring:
+    enabled: false
+    layer: 7
+    dependencies:
+    - network
+    config:
+      retention_days: 7
+      create_dashboard: true
