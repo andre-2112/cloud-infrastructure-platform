@@ -1,14 +1,14 @@
 # Cloud Infrastructure Orchestration Platform - Documentation Index
 
 **Platform:** cloud-0.7
-**Architecture Version:** 4.6
-**Last Updated:** 2025-01-30
+**Architecture Version:** 4.8
+**Last Updated:** 2025-10-31
 
 ---
 
 ## Welcome
 
-This is the master documentation index for the Cloud Infrastructure Orchestration Platform (cloud-0.7). This platform provides comprehensive tools for managing complex, interdependent AWS infrastructure deployments using Pulumi with a Python-based CLI, core business logic library, and dynamic Pulumi.yaml management (NEW in v4.6).
+This is the master documentation index for the Cloud Infrastructure Orchestration Platform (cloud-0.7). This platform provides comprehensive tools for managing complex, interdependent AWS infrastructure deployments using Pulumi with a Python-based CLI, core business logic library, and --config-file based configuration (NEW in v4.8).
 
 ---
 
@@ -17,8 +17,8 @@ This is the master documentation index for the Cloud Infrastructure Orchestratio
 | Document | Description |
 |----------|-------------|
 | [INSTALL.md](INSTALL.md) | **Start here!** Complete installation and build guide for stacks and CLI |
-| [Multi_Stack_Architecture.4.6.md](Multi_Stack_Architecture.4.6.md) | Main architecture document - comprehensive platform overview (v4.6) |
-| [Directory_Structure_Diagram.4.6.md](Directory_Structure_Diagram.4.6.md) | Complete directory structure and organization (v4.6) |
+| [Multi_Stack_Architecture.4.8.md](Multi_Stack_Architecture.4.8.md) | Main architecture document - comprehensive platform overview (v4.8) |
+| [Directory_Structure_Diagram.4.8.md](Directory_Structure_Diagram.4.8.md) | Complete directory structure and organization (v4.8) |
 
 ---
 
@@ -30,21 +30,21 @@ These documents define the current, authoritative architecture:
 
 | Document | Version | Description |
 |----------|---------|-------------|
-| [Complete_Stack_Management_Guide_v4.6.md](Complete_Stack_Management_Guide_v4.6.md) | 4.0 | 🔖 **Authoritative** - Complete platform workflow and management |
-| [Stack_Parameters_and_Registration_Guide_v4.6.md](Stack_Parameters_and_Registration_Guide_v4.6.md) | 4.0 | 🔖 **Authoritative** - Enhanced templates, parameters, and registration |
+| [Complete_Stack_Management_Guide.4.8.md](Complete_Stack_Management_Guide.4.8.md) | 4.8 | 🔖 **Authoritative** - Complete platform workflow and management |
+| [Stack_Parameters_and_Registration_Guide.4.8.md](Stack_Parameters_and_Registration_Guide.4.8.md) | 4.8 | 🔖 **Authoritative** - Enhanced templates, parameters, and registration |
 | [Complete_Guide_Templates_Stacks_Config_and_Registration_v4.6.md](Complete_Guide_Templates_Stacks_Config_and_Registration_v4.6.md) | 4.0 | 🔖 **Authoritative** - Template system and configuration flow |
 | [Implementation_Compliance_Report_v4.md](Implementation_Compliance_Report_v4.md) | 4.0 | Architecture compliance verification report |
 
-### Core Architecture Documents (v4.6)
+### Core Architecture Documents (v4.8)
 
-Updated to align with v4.0 authoritative documents, enhanced in v4.6:
+Updated to align with v4.0 authoritative documents, enhanced in v4.8:
 
 | Document | Version | Description |
 |----------|---------|-------------|
-| [Multi_Stack_Architecture.4.6.md](Multi_Stack_Architecture.4.6.md) | 4.5 | Complete architecture specification with dynamic Pulumi.yaml |
-| [Directory_Structure_Diagram.4.6.md](Directory_Structure_Diagram.4.6.md) | 4.5 | Directory structure reference |
-| [Deployment_Manifest_Specification.4.6.md](Deployment_Manifest_Specification.4.6.md) | 4.5 | Manifest file format with pulumiOrg/project fields |
-| [Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md](Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md) | 4.1 | **NEW v4.6:** Dynamic Pulumi.yaml management system |
+| [Multi_Stack_Architecture.4.8.md](Multi_Stack_Architecture.4.8.md) | 4.8 | Complete architecture specification with --config-file approach |
+| [Directory_Structure_Diagram.4.8.md](Directory_Structure_Diagram.4.8.md) | 4.8 | Directory structure reference |
+| [Deployment_Manifest_Specification.4.8.md](Deployment_Manifest_Specification.4.8.md) | 4.8 | Manifest file format with --config-file parameter |
+| [Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md](Addendum_Dynamic_Pulumi_YAML_Implementation.4.1.md) | 4.1 | Dynamic Pulumi.yaml management system |
 
 ---
 
@@ -213,7 +213,9 @@ cloud/
 
 | Version | Date | Changes |
 |---------|------|---------|
-| **4.5** | **2025-10-30** | **Dynamic Pulumi.yaml management, pulumiOrg/project fields, stacks disabled by default** |
+| **4.8** | **2025-10-31** | **--config-file approach, enhanced CLI with rich modes, deployment lifecycle improvements** |
+| 4.6 | 2025-10-30 | Composite project naming for complete deployment isolation |
+| 4.5 | 2025-10-30 | Dynamic Pulumi.yaml management, pulumiOrg/project fields, stacks disabled by default |
 | 4.1 | 2025-10-29 | Aligned with v4.0 authoritative documents, Python CLI, enhanced templates |
 | 4.0 | 2025-10-28 | Template-first validation, auto-extraction, cross-stack dependencies |
 | 3.1 | 2025-10-21 | Updated Pulumi state management, stack naming, Python CLI |
@@ -222,7 +224,7 @@ cloud/
 
 ---
 
-## Architecture Highlights (v4.6)
+## Architecture Highlights (v4.8)
 
 ### Core/CLI Architecture
 

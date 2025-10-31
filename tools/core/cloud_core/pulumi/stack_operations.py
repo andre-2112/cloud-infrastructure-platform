@@ -56,17 +56,23 @@ class StackOperations:
             # Select/create stack
             self.pulumi.select_stack(pulumi_stack_name, create=True, cwd=stack_dir)
 
-            # Set configuration (only if no config file provided)
-            if not config_file:
+            # Set configuration - load from config_file if provided, otherwise use config dict
+            if config_file:
+                # Load config from YAML file
+                import yaml
+                with open(config_file, 'r', encoding='utf-8') as f:
+                    file_config = yaml.safe_load(f) or {}
+                self.pulumi.set_all_config(file_config, cwd=stack_dir)
+            else:
                 self.pulumi.set_all_config(config, cwd=stack_dir)
 
             if preview_only:
-                # Preview only
-                result = self.pulumi.preview(cwd=stack_dir, config_file=config_file)
+                # Preview only (don't pass config_file, config is already set)
+                result = self.pulumi.preview(cwd=stack_dir)
                 return result.get("success", False), result.get("error")
             else:
-                # Deploy
-                result = self.pulumi.up(cwd=stack_dir, yes=True, config_file=config_file)
+                # Deploy (don't pass config_file, config is already set)
+                result = self.pulumi.up(cwd=stack_dir, yes=True)
                 return result.get("success", False), None
 
         except PulumiError as e:

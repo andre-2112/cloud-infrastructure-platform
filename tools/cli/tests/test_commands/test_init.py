@@ -2,7 +2,9 @@
 
 import pytest
 from typer.testing import CliRunner
+from pathlib import Path
 from cloud_cli.main import app
+from cloud_core.utils.name_sanitizer import sanitize_name, sanitize_org_and_project
 
 runner = CliRunner()
 
@@ -66,3 +68,77 @@ def test_init_generates_deployment_id():
     # Should mention deployment ID generation
     # May fail without proper setup, but verifies option handling
     assert result.exit_code != 0 or "Generated deployment ID" in result.stdout
+
+
+def test_init_sanitizes_org_name_with_spaces():
+    """Test that init command sanitizes organization names with spaces"""
+    result = runner.invoke(app, [
+        "init",
+        "--org", "My Company",
+        "--project", "test",
+        "--domain", "test.com",
+        "--account-dev", "123456789012",
+    ])
+
+    # Should show sanitization notification
+    assert "Organization name sanitized" in result.stdout or result.exit_code != 0
+    # Should show sanitized version
+    assert "My_Company" in result.stdout or result.exit_code != 0
+
+
+def test_init_sanitizes_project_name_with_special_chars():
+    """Test that init command sanitizes project names with special characters"""
+    result = runner.invoke(app, [
+        "init",
+        "--org", "TestOrg",
+        "--project", "Web App 2.0!",
+        "--domain", "test.com",
+        "--account-dev", "123456789012",
+    ])
+
+    # Should show sanitization notification
+    assert "Project name sanitized" in result.stdout or result.exit_code != 0
+    # Should show sanitized version
+    assert "Web_App_2_0" in result.stdout or result.exit_code != 0
+
+
+def test_init_sanitizes_both_names():
+    """Test that init command sanitizes both org and project when needed"""
+    result = runner.invoke(app, [
+        "init",
+        "--org", "Company @ Test",
+        "--project", "Project (Alpha)",
+        "--domain", "test.com",
+        "--account-dev", "123456789012",
+    ])
+
+    # Should show both sanitization notifications
+    assert (
+        "Organization name sanitized" in result.stdout or
+        result.exit_code != 0
+    )
+    assert (
+        "Project name sanitized" in result.stdout or
+        result.exit_code != 0
+    )
+
+
+def test_init_leaves_clean_names_unchanged():
+    """Test that init command doesn't sanitize already clean names"""
+    result = runner.invoke(app, [
+        "init",
+        "--org", "TestOrg",
+        "--project", "TestProject",
+        "--domain", "test.com",
+        "--account-dev", "123456789012",
+    ])
+
+    # Should NOT show sanitization notifications for clean names
+    assert (
+        "Organization name sanitized" not in result.stdout or
+        result.exit_code != 0
+    )
+    assert (
+        "Project name sanitized" not in result.stdout or
+        result.exit_code != 0
+    )

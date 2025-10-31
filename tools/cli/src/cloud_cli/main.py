@@ -28,6 +28,7 @@ from .commands import (
     template_cmd,
     validate_cmd,
     logs_cmd,
+    config_cmd,
 )
 
 # Create main Typer app
@@ -89,6 +90,9 @@ app.add_typer(deploy_stack_cmd.app, help="Deploy a single stack")
 app.add_typer(destroy_cmd.app, help="Destroy all stacks")
 app.add_typer(destroy_stack_cmd.app, help="Destroy a single stack")
 app.add_typer(rollback_cmd.app, help="Rollback deployment")
+
+# Configuration
+app.add_typer(config_cmd.app, help="Configure deployment stacks and environments")
 
 # Status and monitoring
 app.add_typer(status_cmd.app, help="Show deployment status")

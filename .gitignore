@@ -64,7 +64,11 @@ package-lock.json
 !jest.config.js
 tsconfig.tsbuildinfo
 
-# Deployment artifacts
+# Deployment directories - exclude all deployment instances
+# This ensures no deployment directories (with configs, state, logs, etc.) are committed
+deploy/*/
+
+# Additional deployment artifacts (if deploy/*/ doesn't catch everything)
 deploy/*/config/*.yaml
 deploy/*/.pulumi/
 deploy/*/node_modules/

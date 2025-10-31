@@ -36,6 +36,7 @@ class ManifestGenerator:
         domain: str,
         region: str = "us-east-1",
         accounts: Optional[Dict[str, str]] = None,
+        pulumi_org: Optional[str] = None,
         overrides: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
@@ -50,6 +51,7 @@ class ManifestGenerator:
             region: Primary AWS region
             accounts: AWS account IDs by environment
                      E.g., {"dev": "123456789012", "stage": "234567890123"}
+            pulumi_org: Pulumi organization name (for Pulumi Cloud state management)
             overrides: Optional overrides for stack configurations
 
         Returns:
@@ -78,6 +80,10 @@ class ManifestGenerator:
                 "generator_version": "0.7.0",
             },
         }
+
+        # Add pulumi organization if provided
+        if pulumi_org:
+            manifest["pulumiOrg"] = pulumi_org
 
         # Add environments
         manifest["environments"] = self._generate_environments(

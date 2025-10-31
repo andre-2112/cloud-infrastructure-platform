@@ -12,6 +12,7 @@ from datetime import datetime
 from ..templates import TemplateManager, ManifestGenerator
 from ..utils.logger import get_logger
 from ..utils.deployment_id import generate_deployment_id, validate_deployment_id
+from .state_manager import StateManager, StackStatus, DeploymentStatus
 
 logger = get_logger(__name__)
 
@@ -54,6 +55,7 @@ class DeploymentManager:
         region: str = "us-east-1",
         accounts: Optional[Dict[str, str]] = None,
         deployment_id: Optional[str] = None,
+        pulumi_org: Optional[str] = None,
         overrides: Optional[Dict[str, Any]] = None,
     ) -> Path:
         """
@@ -67,6 +69,7 @@ class DeploymentManager:
             region: Primary AWS region
             accounts: AWS account IDs by environment
             deployment_id: Optional deployment ID (auto-generated if not provided)
+            pulumi_org: Pulumi organization name (for Pulumi Cloud state management)
             overrides: Optional manifest overrides
 
         Returns:
@@ -102,6 +105,7 @@ class DeploymentManager:
             template_name=template_name,
             deployment_id=deployment_id,
             organization=organization,
+            pulumi_org=pulumi_org,
             project=project,
             domain=domain,
             region=region,
@@ -217,6 +221,52 @@ class DeploymentManager:
 
         return sorted(deployments, key=lambda d: d.get("created_at", ""), reverse=True)
 
+    def _calculate_deployment_status(self, deployment_dir: Path, environment: str = "dev") -> str:
+        """
+        Calculate deployment status based on deployment-level and stack states
+
+        Args:
+            deployment_dir: Path to deployment directory
+            environment: Environment to check (default: dev)
+
+        Returns:
+            Status string: "deployed", "partial", "failed", "destroyed", or "initializing"
+        """
+        try:
+            state_manager = StateManager(deployment_dir)
+
+            # First check deployment-level status (e.g., DESTROYED)
+            deployment_status = state_manager.get_deployment_status()
+
+            # If deployment is explicitly marked as DESTROYED, return that
+            if deployment_status == DeploymentStatus.DESTROYED:
+                return "destroyed"
+
+            # Otherwise, calculate from stack statuses
+            stack_statuses = state_manager.get_all_stack_statuses(environment)
+
+            if not stack_statuses:
+                return "initializing"
+
+            # Count statuses
+            deployed_count = sum(1 for status in stack_statuses.values() if status == StackStatus.DEPLOYED)
+            failed_count = sum(1 for status in stack_statuses.values() if status == StackStatus.FAILED)
+            total_count = len(stack_statuses)
+
+            # Determine overall status
+            if deployed_count == total_count:
+                return "deployed"
+            elif deployed_count > 0:
+                return "partial"
+            elif failed_count > 0:
+                return "failed"
+            else:
+                return "initializing"
+
+        except Exception as e:
+            logger.debug(f"Error calculating status for {deployment_dir}: {e}")
+            return "initializing"
+
     def get_deployment_metadata(self, deployment_dir: Path) -> Optional[Dict[str, Any]]:
         """
         Get deployment metadata
@@ -231,15 +281,20 @@ class DeploymentManager:
 
         if not metadata_path.exists():
             # Try to extract from directory name
-            return self._extract_metadata_from_dir_name(deployment_dir)
+            metadata = self._extract_metadata_from_dir_name(deployment_dir)
+        else:
+            try:
+                with open(metadata_path, "r", encoding="utf-8") as f:
+                    metadata = yaml.safe_load(f)
+            except Exception as e:
+                logger.error(f"Error reading metadata from {metadata_path}: {e}")
+                return None
 
-        try:
-            with open(metadata_path, "r", encoding="utf-8") as f:
-                metadata = yaml.safe_load(f)
-            return metadata
-        except Exception as e:
-            logger.error(f"Error reading metadata from {metadata_path}: {e}")
-            return None
+        # Calculate actual deployment status based on stack states
+        if metadata:
+            metadata["status"] = self._calculate_deployment_status(deployment_dir)
+
+        return metadata
 
     def _extract_metadata_from_dir_name(self, deployment_dir: Path) -> Dict[str, Any]:
         """

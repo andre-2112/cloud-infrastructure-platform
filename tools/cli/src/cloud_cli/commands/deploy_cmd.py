@@ -18,6 +18,8 @@ from cloud_core.pulumi import PulumiWrapper, StackOperations
 from cloud_core.validation import ManifestValidator, DependencyValidator
 from cloud_core.validation.stack_code_validator import StackCodeValidator
 from cloud_core.utils.logger import get_logger
+from cloud_core.utils.output_formatter import OutputFormatter, OutputLevel
+from cloud_core.utils import AWSErrorHandler
 
 app = typer.Typer()
 console = Console()
@@ -42,53 +44,67 @@ def deploy_command(
     strict: bool = typer.Option(
         False, "--strict", help="Enable strict validation"
     ),
+    yes: bool = typer.Option(
+        False, "--yes", "-y", help="Skip confirmation prompt"
+    ),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="Minimal output (only critical messages)"),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Detailed output"),
 ) -> None:
     """Deploy all stacks in a deployment (Enhanced with code validation)"""
 
     try:
+        # Determine output level
+        if quiet:
+            output_level = OutputLevel.QUIET
+        elif verbose:
+            output_level = OutputLevel.VERBOSE
+        else:
+            output_level = OutputLevel.NORMAL
+
+        output = OutputFormatter(level=output_level, console=console)
+
         # Load deployment
         deployment_manager = DeploymentManager()
         deployment_dir = deployment_manager.get_deployment_dir(deployment_id)
 
         if not deployment_dir:
-            console.print(f"[red]Error:[/red] Deployment {deployment_id} not found")
+            output.error(f"Deployment {deployment_id} not found")
             raise typer.Exit(1)
 
         manifest = deployment_manager.load_manifest(deployment_id)
 
         # Validate environment
         if environment not in manifest.get("environments", {}):
-            console.print(f"[red]Error:[/red] Environment '{environment}' not found in manifest")
+            output.error(f"Environment '{environment}' not found in manifest")
             raise typer.Exit(1)
 
         env_config = manifest["environments"][environment]
         if not env_config.get("enabled", False):
-            console.print(f"[red]Error:[/red] Environment '{environment}' is not enabled")
+            output.error(f"Environment '{environment}' is not enabled")
             raise typer.Exit(1)
 
-        console.print(f"[bold]Deploying {deployment_id} to {environment}[/bold]")
-        console.print()
+        output.section(f"Deploying {deployment_id} to {environment}")
 
         # Validate manifest
-        console.print("Validating deployment...")
+        output.info("Validating deployment...")
         validator = ManifestValidator()
         manifest_path = deployment_dir / "deployment-manifest.yaml"
 
         if not validator.validate_file(manifest_path):
-            console.print("[red]Manifest validation failed:[/red]")
+            output.error("Manifest validation failed:")
             for error in validator.get_errors():
-                console.print(f"  - {error}")
+                output.error(f"  - {error}")
             raise typer.Exit(1)
 
         # Validate dependencies
         dep_validator = DependencyValidator()
         if not dep_validator.validate(manifest.get("stacks", {})):
-            console.print("[red]Dependency validation failed:[/red]")
+            output.error("Dependency validation failed:")
             for error in dep_validator.get_errors():
-                console.print(f"  - {error}")
+                output.error(f"  - {error}")
             raise typer.Exit(1)
 
-        safe_print(console, "[green]✓[/green] Manifest and dependencies valid")
+        output.success("Manifest and dependencies valid")
 
         # Validate stack code against templates
         if validate_code:
@@ -129,23 +145,23 @@ def deploy_command(
                 console.print("\n[yellow]Tip:[/yellow] Run 'cloud validate-stack <stack-name>' for detailed validation")
                 raise typer.Exit(1)
 
-            safe_print(console, "[green]✓[/green] Code validation passed")
+            output.success("Code validation passed")
 
-        console.print()
+        output.info("")
 
         # Create orchestration plan
         orchestrator = Orchestrator(max_parallel=parallel)
         plan = orchestrator.create_plan(manifest.get("stacks", {}))
 
-        console.print(orchestrator.print_plan(plan))
+        output.quiet(orchestrator.print_plan(plan))
 
         if preview:
-            console.print("[yellow]Preview mode - no changes will be made[/yellow]")
+            output.warning("Preview mode - no changes will be made")
             return
 
         # Confirm deployment
-        if not typer.confirm("Proceed with deployment?"):
-            console.print("Deployment cancelled")
+        if not yes and not typer.confirm("Proceed with deployment?"):
+            output.info("Deployment cancelled")
             raise typer.Exit(0)
 
         # Initialize state manager
@@ -157,11 +173,30 @@ def deploy_command(
             deployment_id, manifest, environment, deployment_dir, orchestrator, plan, state_manager
         ))
 
-        console.print()
-        safe_print(console, "[green]✓[/green] Deployment completed successfully")
+        output.info("")
+        output.success("Deployment completed successfully")
 
     except Exception as e:
-        console.print(f"[red]Error:[/red] {e}")
+        error_message = str(e)
+
+        # Check if it's an AWS limit error and format appropriately
+        aws_error = AWSErrorHandler.detect_aws_limit_error(error_message)
+        if aws_error:
+            console.print(aws_error.format_error())
+        else:
+            console.print(f"[red][ERROR][/red] {error_message}")
+
+        # Log error to deployment directory if we have deployment_dir
+        if 'deployment_dir' in locals() and deployment_dir:
+            AWSErrorHandler.log_error_to_deployment(
+                error_message,
+                deployment_dir,
+                deployment_id,
+                environment=environment,
+                operation="deploy"
+            )
+            console.print(f"\n[dim]Error details logged to: {deployment_dir}/logs/[/dim]")
+
         logger.error(f"Deploy command failed: {e}", exc_info=True)
         raise typer.Exit(1)
 
@@ -231,8 +266,20 @@ async def _execute_deployment(
             return success, error
 
         except Exception as e:
+            error_message = str(e)
             logger.error(f"Error deploying stack {stack_name}: {e}")
-            return False, str(e)
+
+            # Log stack-specific error to deployment directory
+            AWSErrorHandler.log_error_to_deployment(
+                error_message,
+                deployment_dir,
+                deployment_id,
+                stack_name=stack_name,
+                environment=environment,
+                operation="deploy"
+            )
+
+            return False, error_message
 
     # Execute orchestrated deployment
     result = await orchestrator.execute_plan(plan, stack_executor, stop_on_error=True)

@@ -105,6 +105,7 @@ class ConfigGenerator:
             # Write deployment metadata
             f.write(f'{composite_project}:deploymentId: "{deployment_id}"\n')
             f.write(f'{composite_project}:organization: "{organization}"\n')
+            f.write(f'{composite_project}:pulumiOrg: "{manifest.get("pulumiOrg", "")}"\n')
             f.write(f'{composite_project}:project: "{project}"\n')
             f.write(f'{composite_project}:domain: "{manifest.get("domain", "")}"\n')
 

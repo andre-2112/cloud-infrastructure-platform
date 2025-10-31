@@ -1,8 +1,8 @@
 # Installation and Build Guide
 
 **Platform:** cloud-0.7
-**Architecture:** 4.6
-**Last Updated:** 2025-01-30
+**Architecture:** 4.8
+**Last Updated:** 2025-10-31
 
 ---
 
