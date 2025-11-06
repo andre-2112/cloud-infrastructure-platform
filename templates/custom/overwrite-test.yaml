@@ -1,0 +1,4 @@
+stacks:
+  stack2:
+    enabled: true
+    dependencies: []
